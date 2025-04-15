@@ -17,8 +17,8 @@ if (!class_exists('Vertuka_Enqueue')) {
         {
             add_action('wp_enqueue_scripts', [$this, 'enqueue_css'], 99);
             add_action('wp_enqueue_scripts', [$this, 'enqueue_js'], 10);
-            add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_css'], 99);
-            add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_js'], 10);
+            // add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_css'], 99);
+            // add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_js'], 10);
         }
 
 
@@ -31,7 +31,7 @@ if (!class_exists('Vertuka_Enqueue')) {
         {
 
             // for prevent cash
-            $randomNumber = '2.2.31';
+            $randomNumber = '2.3.02';
 
             // Enqueue Bootstrap CSS from CDN
 
@@ -132,7 +132,7 @@ if (!class_exists('Vertuka_Enqueue')) {
         {
 
             // for prevent cash
-            $randomNumber = '2.2.71';
+            $randomNumber = '2.2.73';
 
             wp_enqueue_script(
                 'bootstrap',
@@ -198,14 +198,6 @@ if (!class_exists('Vertuka_Enqueue')) {
                     $this->asset_js('neshan.js'),
                     array(),
                     '1.0.0',
-                    true
-                );
-
-                wp_enqueue_script(
-                    'checkout-ajax-script',
-                    get_template_directory_uri() . '/js/checkout-ajax.js',
-                    array('jquery'),
-                    null,
                     true
                 );
 

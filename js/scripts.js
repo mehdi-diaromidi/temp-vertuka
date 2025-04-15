@@ -835,200 +835,7 @@
       }
     );
 
-    /**
-     * Delivary Handler
-     */
-    $(".choose-delivery-method .method").on("click", function () {
-      var selectedMethod = $(this);
-      var deliveryMethodId = selectedMethod
-        .closest(".choose-delivery-method")
-        .attr("id");
-      var containerElement = "#" + deliveryMethodId;
-
-      $(containerElement + " .method").removeClass("active");
-      $(selectedMethod).addClass("active");
-    });
-    $("#vertuka-shipping-delivery .method").on("click", function (e) {
-      const id = $(this).attr("id"); //addresspress-address-599
-      const selector = ".express-cart-price #" + id.replace("vertuka_", "");
-      $(selector)
-        .prop("checked", !$("#yith-wapo-3-0").prop("checked"))
-        .change();
-    });
-
-    // Calculate Shipping Price in Checkout Page
-    let selector = $("#shipping_method input[checked=checked]");
-    let price = $(selector)
-      .closest("li")
-      .find(".woocommerce-Price-amount")
-      .text()
-      .trim()
-      .replace("تومان", "")
-      .replace(",", "")
-      .trim();
-    let label = $(selector).closest("li").find("label").text().trim();
-
-    if (price == "" || price == null) {
-      price = 0;
-    }
-    if (price == 0) {
-      //$( '#vertuka-shipping-method-price .price' ).text( 'پس کرایه ای' );
-    } else {
-      $("#vertuka-shipping-method-price .price").text(price + " تومان");
-    }
-    $("#vertuka-shipping-method-price .title").text(label);
-
-    setInterval(function () {
-      $(".express-cart-price-box").click();
-      $(".express-cart-price-box").trigger("click");
-      // console.log('clicked');
-    }, 500);
-
-    $(".page-checkout-wrapper").on("click", function () {
-      // for delivary
-      let selector = $("#shipping_method input[checked=checked]");
-      let price = $(selector)
-        .closest("li")
-        .find(".woocommerce-Price-amount")
-        .first()
-        .text()
-        .trim()
-        .replace("تومان", "");
-      // let price = $(selector).closest( 'li' ).find( '.woocommerce-Price-amount' ).text().trim().replace( 'تومان', '' ).replace( ',', '' ).trim();
-      let label = $(selector)
-        .closest("li")
-        .find("label")
-        .text()
-        .trim()
-        .split(":");
-
-      if (price == "" || price == null) {
-        price = 0;
-      }
-
-      if (label[0] == "پستپست") {
-        label[0] = "پست";
-      }
-      if (label[0] == "ارسال عادیارسال عادی") {
-        label[0] = "ارسال عادی";
-      }
-      if (label[0] == "ارسال توربوارسال توربو") {
-        label[0] = "ارسال توربو";
-      }
-      // console.log(label[0]);
-
-      $("#vertuka-shipping-method-price .title").text(label[0]);
-      if (label[0] == "پست") {
-        $("#vertuka-time-delivery").addClass("d-none");
-        $("#vertuka_custom_text_field_field #vertuka_custom_text_field").val(
-          "پست"
-        );
-
-        if (price == 0) {
-          $("#vertuka-shipping-method-price .price").text("رایگان");
-        } else {
-          $("#vertuka-shipping-method-price .price").text(price + " تومان");
-        }
-      }
-
-      if (label[0] == "ارسال عادی") {
-        // console.log(" ارسال عادی");
-        $("#vertuka-time-delivery").removeClass("d-none");
-        // console.log($("#vertuka_custom_text_field_field #vertuka_custom_text_field").val().split(" ")[0] != 'ساعت');
-        if (
-          $("#vertuka_custom_text_field_field #vertuka_custom_text_field")
-            .val()
-            .split(" ")[0] != "ساعت"
-        ) {
-          $("#vertuka_custom_text_field_field #vertuka_custom_text_field").val(
-            "پیک-رایگان"
-          );
-        }
-
-        $("input[type=radio][name=MJ-selected-method-date-time]")
-          .prop("checked", true)
-          .trigger("click");
-
-        if (price == 0) {
-          $("#vertuka-shipping-method-price .price").text("رایگان");
-        } else {
-          $("#vertuka-shipping-method-price .price").text(price + " تومان");
-        }
-      }
-
-      if (label[0] == "ارسال توربو") {
-        // console.log(" ارسال توربو");
-        $("#vertuka-time-delivery").addClass("d-none");
-        $("#vertuka_custom_text_field_field #vertuka_custom_text_field").val(
-          "پیک-توربو"
-        );
-
-        if (price == 0) {
-          $("#vertuka-shipping-method-price .price").text("رایگان");
-        } else {
-          $("#vertuka-shipping-method-price .price").text(price + " تومان");
-        }
-      }
-      // if (price == 0) {
-      //   $("#vertuka-shipping-method-price .price").text("رایگان");
-      //   if (
-      //     $(selector).closest("li").find("label").attr("for") ==
-      //     "shipping_method_0_free_shipping10"
-      //   ) {
-      //     $("#vertuka-shipping-method-price .title").text("پیک");
-      //     $("#vertuka-time-delivery").removeClass("d-none");
-      //     $(
-      //       "#vertuka_custom_text_field_field #vertuka_custom_text_field"
-      //     ).val("پیک-رایگان");
-
-      //     $("input[type=radio][name=MJ-selected-method-date-time]")
-      //       .prop("checked", true)
-      //       .trigger("click");
-      //   } else {
-      //     $("#vertuka-shipping-method-price .title").text("پست");
-      //     $("#vertuka-time-delivery").addClass("d-none");
-      //     $(
-      //       "#vertuka_custom_text_field_field #vertuka_custom_text_field"
-      //     ).val("پست-رایگان");
-      //   }
-      // } else {
-      //   $("#vertuka-shipping-method-price .price").text(price + " تومان");
-      //   $("#vertuka-time-delivery").addClass("d-none");
-      //   $("#vertuka_custom_text_field_field #vertuka_custom_text_field").val(
-      //     "پیک-توربو"
-      //   );
-      // }
-
-      // console.log( 'test' );
-      //
-      // //for discounted
-      // $(".original-price-discounted-product > del").each(function() {
-      //     let sum_orginal_price = 0;
-      //
-      //     var value = parseInt($(this).text());
-      //     // sum += isNaN(value) ? 0 : value;
-      //     sum_orginal_price += isNaN(value) ? 0 : value;
-      //     console.log( sum_orginal_price );
-      // });
-
-      // let coupon = $('.mj-applied-coupon-block .text-end .price-to-pay-title').find( 'span' ).text().trim().replace( '-', '' ).trim();
-      // console.log($('.mj-applied-coupon-block .text-end .price-to-pay-title').find( 'span' ));
-      // $('.mj-applied-coupon-block .text-end .price-to-pay-title').find( 'span' ).remove();
-      // $('.mj-applied-coupon-block .text-end .price-to-pay-title').find( 'span' ).append(coupon);
-    });
-
-    // $('#wcmca_address_select_menu_billing').val("0").change();
-    // $('#wcmca_address_select_menu_shipping').val("0").change();
-    // $('#select2-wcmca_address_select_menu_shipping-container').val("0").change();
-    // $( '#vertuka-address-delivery .method' ).on( 'click', function (){
-    //     const id = $(this).attr( 'id' );
-    //     const value = id.replace( 'vertuka_', '');
-    //     $('#wcmca_address_select_menu_billing').val(value).change();
-    //     $('#wcmca_address_select_menu_shipping').val(value).change();
-    //     $('#select2-wcmca_address_select_menu_shipping-container').val(value).change();
-    // });
-    // $( '#vertuka-address-delivery .method' ).removeClass( 'active' );
-    // $( '#vertuka-address-delivery #vertuka_0' ).addClass( 'active' );
+    //md-remove - implement in checkout.min.js
 
     // Sort order button
     $("#sort-product-by a").on("click", function () {
@@ -1058,24 +865,6 @@
       $(".section-buyer-single").toggleClass("active");
     });
 
-    // persian number for price
-    // function convertToPersianNumber(number) {
-    //     var persianNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
-    //     return number.toString().replace(/\d/g, function(digit) {
-    //         return persianNumbers[digit];
-    //     });
-    // }
-    //
-    // // انتخاب المان مورد نظر با استفاده از jQuery
-    // var totalPriceElement = jQuery("#wapo-total-order-price");
-    //
-    // // زمانی که مقدار عدد تغییر کند، عدد را به اعداد فارسی تبدیل کنید
-    // totalPriceElement.on("DOMSubtreeModified", function() {
-    //     var currentPrice = totalPriceElement.text();
-    //     var persianPrice = convertToPersianNumber(currentPrice);
-    //     totalPriceElement.text(persianPrice);
-    // });
-
     //Filter
     // Initially, show all cards
     $(".filter-item").show();
@@ -1094,45 +883,11 @@
       // Hide all cards
       $(".filter-item").hide();
 
-      // Show cards with the selected category or show all if "All" is selected
       if (filterValue === "all") {
         $(".filter-item").fadeIn();
       } else {
         $(".filter-item." + filterValue).fadeIn();
       }
-    });
-
-    $(".content .woocommerce-MyAccount-content .woocommerce-Address")
-      .removeClass("col-1")
-      .addClass("w-100");
-    $(".content .addresses").addClass("delivery-methods");
-    $(".content .addresses .address")
-      .removeClass("col-1")
-      .addClass("w-100 method");
-    $("#wcmca_billing_state_field > label:nth-child(1)").text("استان");
-    $("#wcmca_billing_city_field > label:nth-child(1)").text("شهر");
-    $("#wcmca_billing_city_field > label").text("شهر");
-
-    $("#wcmca_add_new_address_button_shipping").on("click", function () {
-      $("#wcmca_billing_state_field > label:nth-child(1)").text("استان");
-      $("#wcmca_billing_city_field > label:nth-child(1)").text("شهر");
-      $("#wcmca_shipping_city_field > label:nth-child(1)").text("شهر");
-      $("#wcmca_billing_city_field > label").text("شهر");
-      $("#wcmca_shipping_city_field > label").text("شهر");
-      $(
-        "#wcmca_billing_last_name_field, #wcmca_billing_company_field, #wcmca_billing_first_name_field"
-      ).addClass("d-none");
-      $(
-        "#wcmca_shipping_last_name_field, #wcmca_shipping_company_field, #wcmca_shipping_first_name_field"
-      ).addClass("d-none");
-      // console.log("add new address");
-    });
-
-    //refresh checkout page after 2 seconds
-    $("#wcmca_save_address_button_shipping").on("click", function () {
-      setTimeout(function () {
-        location.reload();
-      }, 5000);
     });
 
     new DataTable("#example", {
@@ -1200,14 +955,6 @@
         }
       );
     }
-
-    // Replace <br> with space
-    // if ( $(".delivery-methods .method .wcmca_clear_both").length > 0 ){
-    //     $(".delivery-methods .method .wcmca_clear_both").addClass( 'd-inline' );
-    //     $(".wcmca_clear_both[data-name=billing_postcode], .wcmca_clear_both[data-name=billing_phone], .wcmca_clear_both[data-name=billing_email]").addClass( 'd-block' );
-    //     $(".wcmca_clear_both[data-name=billing_last_name], .wcmca_clear_both[data-name=billing_first_name]").addClass( 'd-block' );
-    //     $(".woocommerce-account .addresses .title .edit").text( 'تغییر | ویرایش')
-    // }
 
     if ($("#sidebar-mobile-menu").length > 0) {
       $("#sidebar-mobile-menu").on("click", function () {
@@ -1325,64 +1072,7 @@
       return input;
     }
 
-    // $( '#wcmca_shipping_address_internal_name' ).on( "keyup change", function() {
-    //     let newVal = $( '#wcmca_shipping_address_internal_name' ).val();
-    //     $( '#wcmca_billing_address_internal_name' ).val( newVal )
-    // });
-    //
-    // $( '#wcmca_shipping_state' ).on( "keyup change", function() {
-    //     let newVal = $( '#wcmca_shipping_state' ).val();
-    //     $( '#wcmca_billing_state' ).val( newVal )
-    // });
-    //
-    // $( '#wcmca_shipping_address_1' ).on( "keyup change", function() {
-    //     let newVal = $( '#wcmca_shipping_address_1' ).val();
-    //     $( '#wcmca_billing_address_1' ).val( newVal )
-    // });
-    //
-    // $( '#wcmca_shipping_address_2' ).on( "keyup change", function() {
-    //     let newVal = $( '#wcmca_shipping_address_2' ).val();
-    //     $( '#wcmca_billing_address_1' ).val( newVal )
-    // });
-    //
-    // $( '#wcmca_shipping_city' ).on( "keyup change", function() {
-    //     let newVal = $( '#wcmca_shipping_city' ).val();
-    //     $( '#wcmca_billing_city' ).val( newVal )
-    // });
-    //
-    //
-    // $( '#wcmca_shipping_postcode' ).on( "keyup change", function() {
-    //     let newVal = $( '#wcmca_shipping_postcode' ).val();
-    //     $( '#wcmca_billing_postcode' ).val( newVal )
-    // });
-
     $("#ship-to-different-address-checkbox").prop("checked", true).change();
-
-    // Handle med_addresspress delivary SAVE NEW ADDRESS
-    // $( '#addresspress-state' ).append( $( '#shipping_state' ).html() );
-    // $( '#addresspress-state' ).on( 'change', function(){
-    //     $( '#shipping_state' ).val( $( this ).val() ).change();
-    //     $( '#addresspress-city' ).html( '' );
-    //     $( '#addresspress-city' ).append( $( '#shipping_city' ).html() );
-    // })
-
-    // $( '#addresspress-edit-address #addresspress-state' ).append( $( '#shipping_state' ).html() );
-    // $( '#addresspress-edit-address #addresspress-state' ).on( 'change', function(){
-    //     $( '#addresspress-edit-address #shipping_state' ).val( $( this ).val() ).change();
-    //     $( '#addresspress-city' ).html( '' );
-    //     $( '#addresspress-city' ).append( $( '#shipping_city' ).html() );
-    // })
-
-    $("#vertuka-shipping-delivery-add-address").on("click", function (e) {
-      e.preventDefault();
-      $(".page-checkout-wrapper.add-address-lightbox")
-        .css("position", "relative")
-        .css("z-index", "-1");
-      $(".progressbar-box.add-address-lightbox").css("z-index", "-1");
-      $(".warning-login.add-address-lightbox").removeClass("d-none");
-      map.resize();
-      mapEdit.resize();
-    });
 
     $(".add-address-lightbox .remove-item").on("click", function (e) {
       $(".page-checkout-wrapper.add-address-lightbox")
@@ -1475,7 +1165,6 @@
 
         $("#vertuka_shipping_method_0_post").click();
       }
-
       map.resize();
       mapEdit.resize();
     });
@@ -1525,68 +1214,64 @@
       $(".warning-login.edit-address-lightbox").addClass("d-none");
     });
 
-    $(".dashboard-container #vertuka-address-delivery").on(
-      "click",
-      ".edit-address",
-      function (e) {
-        e.preventDefault();
-        var element = $(this);
-        var method = element.closest(".position-relative").find(".method");
+    $("#vertuka-address-delivery").on("click", ".edit-address", function (e) {
+      e.preventDefault();
+      var element = $(this);
+      var method = element.closest(".position-relative").find(".method");
 
-        $(".edit-address-lightbox #addresspress-first-name")
-          .val(method.find(".addresspress-address-first-name").text().trim())
-          .change();
-        $(".edit-address-lightbox #addresspress-last-name")
-          .val(method.find(".addresspress-address-last-name").text().trim())
-          .change();
-        $(".edit-address-lightbox #addresspress-address1").text(
-          method.find(".addresspress-address-address1").text().trim()
-        );
-        $(".edit-address-lightbox #addresspress-address2")
-          .val(method.find(".addresspress-address-address2").text().trim())
-          .change();
-        $(".edit-address-lightbox #addresspress-zip-code")
-          .val(
-            convertArabicIndicToWestern(
-              method.find(".addresspress-address-zip-code").text().trim()
-            )
+      $(".edit-address-lightbox #addresspress-first-name")
+        .val(method.find(".addresspress-address-first-name").text().trim())
+        .change();
+      $(".edit-address-lightbox #addresspress-last-name")
+        .val(method.find(".addresspress-address-last-name").text().trim())
+        .change();
+      $(".edit-address-lightbox #addresspress-address1").text(
+        method.find(".addresspress-address-address1").text().trim()
+      );
+      $(".edit-address-lightbox #addresspress-address2")
+        .val(method.find(".addresspress-address-address2").text().trim())
+        .change();
+      $(".edit-address-lightbox #addresspress-zip-code")
+        .val(
+          convertArabicIndicToWestern(
+            method.find(".addresspress-address-zip-code").text().trim()
           )
-          .change();
-        $(".edit-address-lightbox #addresspress-phone")
-          .val(
-            convertArabicIndicToWestern(
-              method.find(".addresspress-address-phone").text().trim()
-            )
+        )
+        .change();
+      $(".edit-address-lightbox #addresspress-phone")
+        .val(
+          convertArabicIndicToWestern(
+            method.find(".addresspress-address-phone").text().trim()
           )
-          .change();
-        $(".edit-address-lightbox #addresspress-address-id")
-          .val(method.attr("id").replace("addresspress-address-", ""))
-          .change();
+        )
+        .change();
+      $(".edit-address-lightbox #addresspress-address-id")
+        .val(method.attr("id").replace("addresspress-address-", ""))
+        .change();
 
-        $(".edit-address-lightbox #coordinatesEdit")
-          .val(method.find(".addresspress-coordinates").text().trim())
+      $(".edit-address-lightbox #coordinatesEdit")
+        .val(method.find(".addresspress-coordinates").text().trim())
+        .change();
+
+      //console.log( convertArabicIndicToWestern( method.find( '.addresspress-address-zip-code' ).text().trim() ) );
+
+      $(".page-checkout-wrapper.edit-address-lightbox")
+        .css("position", "relative")
+        .css("z-index", "-1");
+      $(".progressbar-box.edit-address-lightbox").css("z-index", "-1");
+      $(".warning-login.edit-address-lightbox").removeClass("d-none");
+
+      $(".edit-address-lightbox #addresspress-state")
+        .val(method.find(".addresspress-address-state").text().trim())
+        .change();
+      setTimeout(function () {
+        $(".edit-address-lightbox #addresspress-city")
+          .val(method.find(".addresspress-address-city").text().trim())
           .change();
-
-        //console.log( convertArabicIndicToWestern( method.find( '.addresspress-address-zip-code' ).text().trim() ) );
-
-        $(".page-checkout-wrapper.edit-address-lightbox")
-          .css("position", "relative")
-          .css("z-index", "-1");
-        $(".progressbar-box.edit-address-lightbox").css("z-index", "-1");
-        $(".warning-login.edit-address-lightbox").removeClass("d-none");
-
-        $(".edit-address-lightbox #addresspress-state")
-          .val(method.find(".addresspress-address-state").text().trim())
-          .change();
-        setTimeout(function () {
-          $(".edit-address-lightbox #addresspress-city")
-            .val(method.find(".addresspress-address-city").text().trim())
-            .change();
-        }, 1000);
-        map.resize();
-        mapEdit.resize();
-      }
-    );
+      }, 1000);
+      map.resize();
+      mapEdit.resize();
+    });
 
     $(".page-checkout-wrapper #vertuka-address-delivery").on(
       "click",
@@ -1653,41 +1338,41 @@
   });
 })(jQuery);
 
-function MJ_popup_function() {
-  // mj add popup
-  var modal = document.getElementById("mjModal");
-  modal.style.display = "block";
-  // document.getElementsByClassName("mj-popup-close")[0].onclick = function() {
-  //     modal.style.display = "none";
-  // }
-  // When the user clicks anywhere outside of the modal, close it
-  window.onclick = function (event) {
-    if (event.target == modal) {
-      modal.style.display = "none";
-    }
-  };
-  // mj end popup
-}
+// function MJ_popup_function() {
+//   // mj add popup
+//   var modal = document.getElementById('mjModal');
+//   modal.style.display = 'block';
+//   // document.getElementsByClassName("mj-popup-close")[0].onclick = function() {
+//   //     modal.style.display = "none";
+//   // }
+//   // When the user clicks anywhere outside of the modal, close it
+//   window.onclick = function (event) {
+//     if (event.target == modal) {
+//       modal.style.display = 'none';
+//     }
+//   };
+//   // mj end popup
+// }
 
-function MJ_popup_function_only_one() {
-  var modal = document.getElementById("mjModalOnlyOne");
-  modal.style.display = "block";
-  window.onclick = function (event) {
-    if (event.target == modal) {
-      modal.style.display = "none";
-    }
-  };
-  jQuery(".div-close").on("click", function () {
-    modal.style.display = "none";
-  });
-}
+// function MJ_popup_function_only_one() {
+//   var modal = document.getElementById('mjModalOnlyOne');
+//   modal.style.display = 'block';
+//   window.onclick = function (event) {
+//     if (event.target == modal) {
+//       modal.style.display = 'none';
+//     }
+//   };
+//   jQuery('.div-close').on('click', function () {
+//     modal.style.display = 'none';
+//   });
+// }
 
-function MJ_popup_function_exit() {
-  // mj add popup
-  var modal = document.getElementById("mjModal");
-  modal.style.display = "none";
-  // mj end popup
-}
+// function MJ_popup_function_exit() {
+//   // mj add popup
+//   var modal = document.getElementById('mjModal');
+//   modal.style.display = 'none';
+//   // mj end popup
+// }
 
 jQuery(document).ready(function () {
   jQuery('[data-toggle="tooltip"]').tooltip();

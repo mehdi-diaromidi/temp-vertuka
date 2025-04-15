@@ -551,3 +551,171 @@ function vertuka_debug_popup($data)
         }
     }
 }
+
+
+add_filter('woocommerce_form_field', 'replace_shipping_city_select_with_input', 10, 4);
+function replace_shipping_city_select_with_input($field, $key, $args, $value)
+{
+    if ($key === 'shipping_city') {
+        $args['type'] = 'text';
+        $args['class'] = array('form-row-wide');
+        $args['label'] = __('شهر', 'woocommerce');
+        $args['placeholder'] = __('نام شهر را وارد کنید...', 'woocommerce');
+
+        $field = '<p class="form-row ' . esc_attr(implode(' ', $args['class'])) . '" id="' . esc_attr($args['id']) . '_field" data-priority="' . esc_attr($args['priority']) . '">';
+        $field .= '<label for="' . esc_attr($args['id']) . '" class="' . ($args['required'] ? 'required' : '') . '">' . $args['label'] . '</label>';
+        $field .= '<input type="' . esc_attr($args['type']) . '" class="input-text" name="' . esc_attr($key) . '" id="' . esc_attr($args['id']) . '" placeholder="' . esc_attr($args['placeholder']) . '" value="' . esc_attr($value) . '" />';
+        $field .= '</p>';
+    }
+
+    return $field;
+}
+
+function sync_shipping_with_billing_address($order_id)
+{
+    // Get the order object
+    $order = wc_get_order($order_id);
+
+    if (!$order) {
+        return;
+    }
+
+    // Get shipping and shipping addresses
+    $shipping_address = array(
+        'first_name' => $order->get_shipping_first_name(),
+        'last_name'  => $order->get_shipping_last_name(),
+        'company'    => $order->get_shipping_company(),
+        'address_1'  => $order->get_shipping_address_1(),
+        'address_2'  => $order->get_shipping_address_2(),
+        'city'       => $order->get_shipping_city(),
+        'state'      => $order->get_shipping_state(),
+        'postcode'   => $order->get_shipping_postcode(),
+        'country'    => $order->get_shipping_country(),
+        'phone'      => $order->get_shipping_phone(),
+    );
+
+    // Update billing address with billing address data
+    $order->set_billing_first_name($shipping_address['first_name']);
+    $order->set_billing_last_name($shipping_address['last_name']);
+    $order->set_billing_company($shipping_address['company']);
+    $order->set_billing_address_1($shipping_address['address_1']);
+    $order->set_billing_address_2($shipping_address['address_2']);
+    $order->set_billing_city($shipping_address['city']);
+    $order->set_billing_state($shipping_address['state']);
+    $order->set_billing_postcode($shipping_address['postcode']);
+    $order->set_billing_country($shipping_address['country']);
+
+    // Save the updated order data
+    $order->save();
+}
+/**
+ * Set shipping address equal to billing address after order creation.
+ */
+add_action('woocommerce_checkout_update_order_meta', 'sync_shipping_with_billing_address');
+
+
+
+
+// function empty_minicart_nonce()
+// {
+//     if (!check_ajax_referer('empty_minicart_nonce', 'security', false)) {
+//         wp_send_json_error('خطا: نانس نامعتبر!');
+//     }
+
+//     if (WC()->cart) {
+//         WC()->cart->empty_cart();
+//         wp_send_json_success(array('message' => 'سبد خرید با موفقیت خالی شد.'));
+//     } else {
+//         wp_send_json_error(array('message' => 'خطا: سبد خرید در دسترس نیست.'));
+//     }
+// }
+// add_action('wp_ajax_empty_cart', 'empty_minicart_nonce');
+// add_action('wp_ajax_nopriv_empty_cart', 'empty_minicart_nonce');
+
+
+
+// function empty_cart_single_ajax()
+// {
+//     // check_ajax_referer('empty_cart_single_nonce', 'security');
+//     if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'empty_cart_nonce')) {
+//         wp_send_json_error('Nonce verification failed');
+//     }
+
+//     $product_id = isset($_POST['product_id']) ? intval($_POST['product_id']) : 0;
+
+//     if (!$product_id) {
+//         wp_send_json_error('Invalid product ID');
+//     }
+
+//     // حذف محصول از سبد خرید
+//     foreach (WC()->cart->get_cart() as $cart_item_key => $cart_item) {
+//         if ($cart_item['product_id'] == $product_id) {
+//             WC()->cart->remove_cart_item($cart_item_key);
+//             wp_send_json_success('Product removed successfully');
+//         }
+//     }
+
+//     wp_send_json_error('Product not found in cart');
+// }
+// add_action('wp_ajax_empty_cart_single_ajax', 'empty_cart_single_ajax');
+// add_action('wp_ajax_nopriv_empty_cart_single_ajax', 'empty_cart_single_ajax');
+
+
+// // mini
+// function enqueue_custom_ajax_mini_script()
+// {
+
+//     wp_localize_script(
+//         'custom-mini-ajax-script',
+//         'customAjax',
+//         array(
+//             'ajaxurl' => admin_url('admin-ajax.php'),
+//             'nonce'   => wp_create_nonce('empty_minicart_nonce')
+//         )
+//     );
+// }
+// add_action('wp_enqueue_scripts', 'enqueue_custom_ajax_mini_script');
+// // تعریف عملکرد AJAX برای کاربران لاگین‌شده
+// add_action('wp_ajax_my_custom_ajax_action', 'handle_custom_ajax_request');
+
+// // تعریف عملکرد AJAX برای کاربران غیرلاگین
+// add_action('wp_ajax_nopriv_my_custom_ajax_action', 'handle_custom_ajax_request');
+
+// function handle_custom_ajax_request()
+// {
+//     if (WC()->cart) {
+//         WC()->cart->empty_cart();
+//         wp_send_json_success(array('message' => 'سبد خرید با موفقیت خالی شد.'));
+//     } else {
+//         wp_send_json_error(array('message' => 'خطا: سبد خرید در دسترس نیست.'));
+//     }
+// }
+// mini
+
+
+
+function enqueue_custom_scripts()
+{
+    wp_enqueue_script('emty-cart-ajax-script', get_template_directory_uri() . '/js/cart-ajax-managmet.js', array('jquery'), null, true);
+    wp_localize_script('emty-cart-ajax-script', 'wc_empty_cart_params', array(
+        'ajax_url' => admin_url('admin-ajax.php'),
+        'nonce'   => wp_create_nonce('empty_cart_nonce')
+    ));
+}
+add_action('wp_enqueue_scripts', 'enqueue_custom_scripts');
+
+
+function empty_cart_ajax()
+{
+    // check_ajax_referer('empty_cart_nonce', 'security');
+    // wp_send_json_success($_POST['_nonce']);
+
+    if (WC()->cart) {
+        WC()->cart->empty_cart();
+        wp_send_json_success(array('message' => 'سبد خرید با موفقیت خالی شد.'));
+    } else {
+        wp_send_json_error(array('message' => 'خطا: سبد خرید در دسترس نیست.'));
+    }
+}
+add_action('wp_ajax_empty_cart', 'empty_cart_ajax');
+add_action('wp_ajax_nopriv_empty_cart', 'empty_cart_ajax');
