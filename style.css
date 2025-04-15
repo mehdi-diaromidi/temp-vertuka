@@ -1,0 +1,64 @@
+/*!
+Theme Name: vertuka
+Theme URI: http://underscores.me/
+Author: Aramin
+Author URI: https://KarinaCo.org
+Description: This Template Created by Mohsen Hasanpour from AraminCo for Vertuka Shop
+Version: 1.0.0
+Tested up to: 5.4
+Requires PHP: 5.6
+License: GNU General Public License v2 or later
+License URI: LICENSE
+Text Domain: vertuka
+Tags: custom-background, custom-logo, custom-menu, featured-images, threaded-comments, translation-ready
+
+This theme, like WordPress, is licensed under the GPL.
+Use it to make something cool, have fun, and share what you've learned.
+
+vertuka is based on Underscores https://underscores.me/, (C) 2012-2020 Automattic, Inc.
+Underscores is distributed under the terms of the GNU GPL v2 or later.
+
+Normalizing styles have been helped along thanks to the fine work of
+Nicolas Gallagher and Jonathan Neal https://necolas.github.io/normalize.css/
+*/
+
+/*--------------------------------------------------------------
+>>> TABLE OF CONTENTS:
+----------------------------------------------------------------
+/* استایل گالری اسلایدشو */
+.custom-gallery-slider {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.custom-gallery-slider .gallery-slide {
+  display: none;
+}
+
+.custom-gallery-slider .gallery-slide:first-child {
+  display: block;
+}
+
+.custom-gallery-slider.slick-initialized .gallery-slide {
+  display: block;
+}
+
+.custom-gallery-slider img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.custom-gallery-slider .slick-prev,
+.custom-gallery-slider .slick-next {
+  z-index: 1;
+}
+
+.custom-gallery-slider .slick-prev {
+  left: 10px;
+}
+
+.custom-gallery-slider .slick-next {
+  right: 10px;
+}

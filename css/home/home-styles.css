@@ -1,0 +1,156 @@
+/* Promotion Section Styles - Start */
+.torbo-text-last {
+  font-size: 1.5em !important;
+}
+@keyframes shine {
+  0% {
+    top: 100%;
+    left: 100%;
+  }
+
+  100% {
+    top: -120%;
+    left: -120%;
+  }
+}
+
+.torbo-row::before {
+  content: "";
+  z-index: 10 !important;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: -120%;
+  left: -120%;
+  background: linear-gradient(
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 45%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(255, 255, 255, 0.1) 75%,
+    transparent 100%
+  );
+  transition: all 1s;
+  transform: rotate(-45deg);
+  animation: shine 3s infinite forwards;
+}
+
+.torbo-row:hover .torbo-message-cell {
+  transform: rotate(10deg) scale(1.2);
+}
+
+.torbo-message-cell {
+  transition: transform 0.5s ease-in-out;
+}
+
+.torbo-row-1::before {
+  animation-delay: 0.5s;
+}
+
+.torbo-row-2::before {
+  animation-delay: 1s;
+}
+
+.torbo-row-3::before {
+  animation-delay: 1.5s;
+}
+
+.torbo-row {
+  position: relative;
+  overflow: hidden;
+  mask-repeat: no-repeat;
+  mask-size: cover;
+  z-index: 999;
+  background-color: #f4f4f4;
+  border: 1px solid #e0e0e0;
+}
+.item-cta-icon_img {
+  height: 60px;
+}
+
+.img-cell {
+  padding: 0px 35px;
+}
+
+.off-products-section {
+  margin-top: 40px;
+}
+
+@media (max-width: 720px) {
+  .torbo-dekstop {
+    display: none;
+  }
+
+  .item-cta-icon_img_mobile {
+    border-radius: 15px;
+  }
+}
+
+@media (min-width: 720px) and (max-width: 1399px) {
+  .torbo-mobile {
+    display: none;
+  }
+
+  .torbo-dekstop {
+    width: 40% !important;
+  }
+
+  .promotion-section .col-lg-8.col-12.mb-lg-0.mb-4 {
+    width: 60% !important;
+  }
+}
+
+@media (min-width: 1400px) {
+  .torbo-mobile {
+    display: none;
+  }
+
+  .torbo-dekstop {
+    width: 33.33% !important;
+  }
+
+  .promotion-section .col-lg-8.col-12.mb-lg-0.mb-4 {
+    width: 66.66% !important;
+  }
+}
+
+.torbo-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80px;
+}
+
+.torbo-cell p {
+  margin-top: 0px !important;
+  margin-bottom: 0px !important;
+}
+
+.row-gap {
+  margin-bottom: 10px;
+}
+
+.item-cta-number_p {
+  color: #48ae42;
+  font-size: 32px;
+  font-weight: 900;
+}
+
+.item-cta-text_p {
+  font-weight: 900;
+  font-size: 1.2em;
+  color: black;
+  font-weight: 900;
+  font-size: 18px;
+  color: black;
+  text-align: justify;
+  padding-left: 10px;
+}
+
+.item-cta-text_span {
+  color: #48ae42;
+}
+
+.container.mt-5 .row {
+  border-radius: 15px;
+}
+/* Promotion Section Styles - End */

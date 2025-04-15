@@ -1,0 +1,84 @@
+input[type="file"] {
+    display: none;
+}
+
+.custom-file-upload {
+    width: 155px;
+    height: 34px;
+    padding: 8px 16px 8px 16px;
+    border-radius: 10px;
+    gap: 8px;
+}
+
+.frame-3000 {
+    width: 335px;
+    height: 64px;
+    margin-top: 18px;
+    gap: 8px;
+
+}
+
+.frame-3000 img {
+    width: 64px;
+    height: 64px;
+    gap: 6px
+}
+
+.Frame-13142 {
+    width: 345px;
+    height: 389px;
+    padding: 16px;
+    border-radius: 15px;
+    gap: 16px;
+    margin-top: 18px;
+}
+
+.add-new-info {
+    display: inline-flex;
+    width: 192px;
+    padding: 8px 16px;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    border-radius: 10px;
+    background: #E0E0E0;
+}
+form textarea:focus{
+    outline: none;
+}
+.email-btn{
+    width : 100%
+}
+.Two-step-verification-btn{
+    width: 100%;
+}
+.label{
+    margin: 24px 0;
+}
+
+@media only screen and (min-width: 992px) {
+    .Frame-13142{
+        width : 230px
+    }
+    .form-info{
+        width: 300px;
+    }
+    .email-btn{
+        width : 421px;
+        margin-left: 8px;
+    }
+    .Two-step-verification-btn{
+        width : 165px
+    }
+    .logo-img{
+        width: 96px;
+    }
+}
+@media only screen and (min-width: 1300px) {
+    .Frame-13142{
+        width : 398px
+    }
+    .form-info{
+        width: 594px;
+    }
+}

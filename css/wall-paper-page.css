@@ -1,0 +1,116 @@
+/* General Styles */
+.wallpaper-page-wraper {
+  display: flex; /* Use Flexbox for centering */
+  justify-content: center; /* Center the .wall-wall-image-grid horizontally */
+  align-items: center; /* Optional: Center vertically if needed */
+  padding: 20px; /* Add some padding for spacing */
+}
+
+.wall-image-grid {
+  width: 75%; /* Set the width of the grid to 80% */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px; /* Space between images */
+  margin: 0 auto; /* Center the grid using margin */
+  box-sizing: border-box; /* Ensure padding and borders are included in the width */
+}
+
+.wall-image-item {
+  flex: 1 1 31%; /* 3 columns on desktop */
+  max-width: 31%;
+  box-sizing: border-box;
+}
+
+.wall-image-item img {
+  width: 100%;
+  height: auto;
+  border-radius: 15px; /* Optional: Rounded corners */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: Shadow effect */
+}
+
+/* Tablet Styles (2 columns) */
+@media (max-width: 768px) {
+  .wall-image-item {
+    flex: 1 1 48%; /* 2 columns on tablets */
+    max-width: 48%;
+  }
+  .wall-image-item img {
+    min-height: 45vh !important;
+    max-height: 45vh !important;
+  }
+}
+
+/* Mobile Styles (1 column) */
+@media (max-width: 480px) {
+  .wall-image-item {
+    flex: 1 1 100%; /* 1 column on mobile */
+    max-width: 100%;
+    margin-top: 15px;
+    margin-bottom: 15px;
+  }
+  #wall-main {
+    text-align: center;
+    padding: 25px !important;
+  }
+  .wall-image-grid {
+    width: 100%;
+  }
+  #wall-main > h1 {
+    font-size: 22px;
+    text-align: right;
+  }
+  #wall-main > p {
+    font-size: 16px;
+  }
+  .wall-image-item img {
+    min-height: auto !important;
+    max-height: 100% !important;
+  }
+}
+
+.wall-download-button {
+  border-radius: 15px;
+  background: #1f9a17;
+  padding: 14px 25px;
+  color: #f5f8ff;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  display: block;
+  margin-top: 10px; /* Add some space between the image and the button */
+  text-decoration: none; /* Remove underline from the link */
+  transition: background 0.3s ease; /* Smooth hover effect */
+}
+
+/* Hover Effect */
+.wall-download-button:hover {
+  background: #167b13; /* Darker shade on hover */
+  color: white !important;
+}
+
+#wall-main {
+  text-align: center;
+  padding: 25px;
+  padding-right: 7%;
+  padding-left: 7%;
+}
+#wall-main > h1 {
+  color: #000b29;
+  font-size: 28px;
+  font-weight: 900;
+  line-height: 40px;
+  text-align: right;
+}
+#wall-main > p {
+  color: #000b29;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 28px;
+  text-align: justify;
+}
+
+.wall-image-item img {
+  min-height: 66vh;
+  max-height: 66vh;
+}
