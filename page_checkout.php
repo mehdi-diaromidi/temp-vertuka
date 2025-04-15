@@ -69,7 +69,6 @@ if (!is_user_logged_in()) {
                             },
                             success: function(response) {
                                 var res = JSON.parse(response);
-                                //Todo here removed
                                 if (typeof res == "object") {
 
                                     let html = 'خطا';
@@ -177,6 +176,7 @@ if (!is_user_logged_in()) {
                         $('.med-error').removeClass('d-none');
                         $('.login-box-modal .med-error').html();
                         let html = 'شماره وارد شده معتبر نیست.';
+
                         $('.login-box-modal .med-error').text(html);
                     }
                 }
@@ -216,6 +216,18 @@ if (!is_user_logged_in()) {
                                 var res = JSON.parse(response);
                                 $('.login-box-modal').css('filter', 'brightness(1)');
                                 if (res === 'ok') {
+
+                                    // MD - Save user data in local storage - Start
+                                    var storedData = JSON.parse(localStorage.getItem('userData')) || [];
+
+                                    // اضافه کردن مقدار جدید به آرایه
+                                    storedData.push({
+                                        phone: phone
+                                    });
+
+                                    // ذخیره مجدد در localStorage
+                                    localStorage.setItem('userData', JSON.stringify(storedData));
+                                    // MD - Save user data in local storage - End
 
                                     setTimeout(function() {
                                         location.reload();
@@ -283,10 +295,6 @@ if (!is_user_logged_in()) {
             font-size: 17px !important;
             font-weight: 700 !important;
             line-height: 22px !important;
-        }
-
-        .med-rp-counter>.labels>span.seprator {
-            /* width: auto !important; */
         }
 
         .med-form-container {
@@ -463,6 +471,17 @@ if (!is_user_logged_in()) {
                                     setTimeout(function() {
                                         $('.warning-login.national-code').addClass('d-none');
                                     }, 2000);
+
+                                    var storedData = JSON.parse(localStorage.getItem('userData')) || [];
+
+                                    var newUser = {
+                                        national_code: nationalCodeValue,
+                                        name: name,
+                                        family: family
+                                    };
+                                    storedData.push(newUser);
+
+                                    localStorage.setItem('userData', JSON.stringify(storedData));
                                 },
                                 error: function(error) {
                                     $('#alert-national-code .general').fadeOut(50);
@@ -477,10 +496,6 @@ if (!is_user_logged_in()) {
                             $('.formNationalCode').removeClass('d-none');
                         }
                     });
-
-
-
-
                 });
             })(jQuery);
         </script>
@@ -597,10 +612,15 @@ if (!is_user_logged_in()) {
                                     <button id="med_registerpress_nationalcode_button" class="w-100" style="background-color: #1f9a17">ثبت</button>
                                 </div>
                             </form>
+                            <!-- <div id="alert-national-code" class="alert bg-light d-none">
+                                <p class="general text-muted m-0 d-none">در حال بررسی اطلاعات وارد شده...</p>
+                                <p class="result_user_data m-0 d-none">میخواهم پیغام در اینجا نمایش داده شود</p>
+                            </div> -->
                             <div id="alert-national-code" class="alert bg-light d-none">
                                 <p class="general text-muted m-0 d-none">در حال بررسی اطلاعات وارد شده...</p>
-                                <p class="success text-success m-0 d-none">ثبت نام شما با موفقیت انجام شد</p>
-                                <p class="error text-danger m-0 d-none">کد ملی وارد شده اشتباه است.</p>
+                                <p class="success text-success m-0 d-none">اطلاعات شما با موفقیت ثبت گردید</p>
+                                <p class="error text-danger m-0 d-none">کد ملی وارد شده با شماره تماس مطابقت ندارد!</p>
+                                <!-- <p class="error-2-4 text-danger m-0 d-none">خطا در برقراری با سرویس</p> -->
                                 <p class="f-error text-danger m-0 d-none">لطفا فرم را کامل کنید و کد ملی معتبر وارد کنید.</p>
                             </div>
                         </div>
@@ -624,14 +644,12 @@ if (!is_user_logged_in()) {
                                 </div>
                             </div>
                             <div>
-                                <!-- //Todo mdc - 5 - it has a js event that trigger to show lightbox on script.js line 1369 -->
                                 <h3>افزودن آدرس</h3>
                             </div>
                         </div>
                         <div>
                             <h4>مشخصات تحویل‌گیرنده</h4>
                         </div>
-                        <!--//Todo mdc - 5 - we are going to add address  -->
                         <div><?php echo do_shortcode('[addresspress_add_address_form]'); ?></div>
                     </div>
                 </div>
@@ -691,344 +709,319 @@ if (!is_user_logged_in()) {
                             </div>
                         </div>
 
-
-
-                        <hr>
-                        <div class="cart-details-footer">
-                            <div class="d-flex justify-content-between">
-                                <div class="total-price">
-                                    <div class="label">مبلغ قابل پرداخت</div>
-                                    <div class="price">
-                                        <span class="woocommerce-Price-amount amount"><bdi>۲۲,۴۰۱,۰۰۰&nbsp;<span class="woocommerce-Price-currencySymbol">تومان</span></bdi></span>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <a href="/cart" class="d-block checkout">تسویه حساب</a>
-                                </div>
+                        <div class="d-none d-md-block">
+                            <div class="remove-all-box">
+                                <a class="remove-all-link" href="/cart/?prowc_empty_cart=yes">
+                                    <i class="icon trash"></i>
+                                    <span>حذف محصولات سبد خرید</span>
+                                </a>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- mdc - here is the remove from cart shit-->
-                    <div class="d-none d-md-block">
-                        <div class="remove-all-box">
-                            <button id="md-empty-cart-button" class="button" data-nonce="<?php echo wp_create_nonce('empty_cart_nonce'); ?>" data-attr-diff="checkout">
-                                <img class=" emty-cart-icon trash" src="<?php echo get_template_directory_uri() . '/assets/images/TrashCan.svg' ?>" width="20px"></img>
-                                <span class="emty-cart-text">حذف محصولات سبد خرید</span>
-                                <img class="emty-cart-spinner spin-me d-none low-opacity" src="<?php echo get_template_directory_uri() . '/assets/images/spinner-emty-cart.svg' ?>" width="30px">
-                            </button>
+                <div class="cart-content">
+                    <div class="py-2">
+                        <div class="row">
+                            <?php
+                            do_action('woocommerce_review_order_before_cart_contents');
+
+                            foreach (WC()->cart->get_cart() as $cart_item_key => $cart_item) {
+                                $esc_thumbnail_url = esc_url(get_the_post_thumbnail_url($cart_item['product_id'], 'full'));
+
+                                $_product = apply_filters('woocommerce_cart_item_product', $cart_item['data'], $cart_item, $cart_item_key);
+
+                                if ($_product && $_product->exists() && $cart_item['quantity'] > 0 && apply_filters('woocommerce_checkout_cart_item_visible', true, $cart_item, $cart_item_key)) {
+                            ?>
+                                    <div class="col-4 col-md-3 col-lg-3 col-xl-2">
+                                        <div class="inner-box-checkout p-2">
+                                            <div class="img-box">
+                                                <img class="img-fluid" src="<?php echo esc_url($esc_thumbnail_url); ?>" alt="<?php echo wp_kses_post(apply_filters('woocommerce_cart_item_name', $_product->get_name(), $cart_item, $cart_item_key)) . '&nbsp;'; ?>">
+
+                                                <div class="count-item">
+                                                    <span>
+                                                        <?php echo apply_filters('woocommerce_checkout_cart_item_quantity', ' <span>' . sprintf('&times;&nbsp;%s', $cart_item['quantity']) . '</span>', $cart_item, $cart_item_key); ?>
+                                                    </span>
+                                                </div>
+
+                                            </div>
+                                            <!--                                        <div>-->
+                                            <!--                                            <h2 class="title text-center mt-2">-->
+                                            <!--                                                --><?php //echo wp_kses_post(apply_filters('woocommerce_cart_item_name', $_product->get_name(), $cart_item, $cart_item_key)) . '&nbsp;'; 
+                                                                                                    ?>
+                                            <!--                                                --><?php //echo wc_get_formatted_cart_item_data($cart_item); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 
+                                                                                                    ?>
+                                            <!--                                            </h2>-->
+                                            <!--                                        </div>-->
+                                        </div>
+                                    </div>
+                            <?php
+                                }
+                            }
+
+                            do_action('woocommerce_review_order_after_cart_contents');
+                            ?>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <div class="cart-content">
-                <div class="py-2">
-                    <div class="row">
-                        <?php
-                        do_action('woocommerce_review_order_before_cart_contents');
-
-                        foreach (WC()->cart->get_cart() as $cart_item_key => $cart_item) {
-                            $esc_thumbnail_url = esc_url(get_the_post_thumbnail_url($cart_item['product_id'], 'full'));
-
-                            $_product = apply_filters('woocommerce_cart_item_product', $cart_item['data'], $cart_item, $cart_item_key);
-
-                            if ($_product && $_product->exists() && $cart_item['quantity'] > 0 && apply_filters('woocommerce_checkout_cart_item_visible', true, $cart_item, $cart_item_key)) {
-                        ?>
-                                <div class="col-4 col-md-3 col-lg-3 col-xl-2">
-                                    <div class="inner-box-checkout p-2">
-                                        <div class="img-box">
-                                            <img class="img-fluid" src="<?php echo esc_url($esc_thumbnail_url); ?>" alt="<?php echo wp_kses_post(apply_filters('woocommerce_cart_item_name', $_product->get_name(), $cart_item, $cart_item_key)) . '&nbsp;'; ?>">
-
-                                            <div class="count-item">
-                                                <span>
-                                                    <?php echo apply_filters('woocommerce_checkout_cart_item_quantity', ' <span>' . sprintf('&times;&nbsp;%s', $cart_item['quantity']) . '</span>', $cart_item, $cart_item_key); ?>
-                                                </span>
-                                            </div>
-
-                                        </div>
-                                        <!--                                        <div>-->
-                                        <!--                                            <h2 class="title text-center mt-2">-->
-                                        <!--                                                --><?php //echo wp_kses_post(apply_filters('woocommerce_cart_item_name', $_product->get_name(), $cart_item, $cart_item_key)) . '&nbsp;'; 
-                                                                                                ?>
-                                        <!--                                                --><?php //echo wc_get_formatted_cart_item_data($cart_item); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped 
-                                                                                                ?>
-                                        <!--                                            </h2>-->
-                                        <!--                                        </div>-->
-                                    </div>
-                                </div>
-                        <?php
-                            }
-                        }
-
-                        do_action('woocommerce_review_order_after_cart_contents');
-                        ?>
-                    </div>
-                </div>
 
 
 
 
-                <div class="warning-login edit-address-lightbox pt-4 d-none">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-xl-7 col-lg-9 col-md-11 col-12 mx-auto">
-                                <div class="login-box-modal">
-                                    <div class="content-box">
-                                        <div class="mb-4 d-flex">
-                                            <div class="me-4">
-                                                <div class="remove remove-item">
-                                                    <i class="icon close m-0"></i>
+                    <div class="warning-login edit-address-lightbox pt-4 d-none">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-xl-7 col-lg-9 col-md-11 col-12 mx-auto">
+                                    <div class="login-box-modal">
+                                        <div class="content-box">
+                                            <div class="mb-4 d-flex">
+                                                <div class="me-4">
+                                                    <div class="remove remove-item">
+                                                        <i class="icon close m-0"></i>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <h3>افزودن آدرس</h3>
                                                 </div>
                                             </div>
                                             <div>
-                                                <h3>افزودن آدرس</h3>
+                                                <h4>مشخصات خریدار</h4>
                                             </div>
+                                            <div><?php echo do_shortcode('[addresspress_edit_address_form]'); ?></div>
                                         </div>
-                                        <div>
-                                            <h4>مشخصات خریدار</h4>
-                                        </div>
-                                        <div><?php echo do_shortcode('[addresspress_edit_address_form]'); ?></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div id="vertuka-address-delivery" class="choose-delivery-method">
-                    <div class="title">
-                        <h2>انتخاب آدرس</h2>
-                    </div>
-                    <div class="delivery-methods">
-                        <!--//Todo mdc - 1 - here is the address list -->
-                        <!-- what is addresspress_address_list and how its works? 
-                            : in class-med-addresspress-public.php : 
-                            -->
-                        <?php echo do_shortcode('[addresspress_address_list]'); ?>
-                        <div>
-                            <a href="#vertuka-shipping-delivery-add-address" id="vertuka-shipping-delivery-add-address" class="add-new-address">افزودن آدرس جدید</a>
+
+                    <div id="vertuka-address-delivery" class="choose-delivery-method">
+                        <div class="title">
+                            <h2>انتخاب آدرس</h2>
+                        </div>
+                        <div class="delivery-methods">
+                            <?php echo do_shortcode('[addresspress_address_list]'); ?>
+                            <div>
+                                <a href="#vertuka-shipping-delivery-add-address" id="vertuka-shipping-delivery-add-address" class="add-new-address">افزودن آدرس جدید</a>
+                            </div>
                         </div>
                     </div>
-                </div>
+                    <?php
 
-                <?php
+                    // MD - return correct shipping methods - START
+                    // function bbloomer_get_all_shipping_zones()
+                    // {
+                    //     $data_store = WC_Data_Store::load('shipping-zone');
+                    //     $raw_zones = $data_store->get_zones();
+                    //     foreach ($raw_zones as $raw_zone) {
+                    //         $zones[] = new WC_Shipping_Zone($raw_zone);
+                    //     }
+                    //     return $zones;
+                    // }
 
-                // MD - return correct shipping methods - START
-                // function bbloomer_get_all_shipping_zones()
-                // {
-                //     $data_store = WC_Data_Store::load('shipping-zone');
-                //     $raw_zones = $data_store->get_zones();
-                //     foreach ($raw_zones as $raw_zone) {
-                //         $zones[] = new WC_Shipping_Zone($raw_zone);
-                //     }
-                //     return $zones;
-                // }
+                    // function filter_shipping_methods_by_location($input_location)
+                    // {
+                    //     $filtered_shipping_methods = [];
 
-                // function filter_shipping_methods_by_location($input_location)
-                // {
-                //     $filtered_shipping_methods = [];
+                    //     foreach (bbloomer_get_all_shipping_zones() as $zone) {
+                    //         $zone_name = $zone->get_zone_name();
+                    //         $zone_locations = $zone->get_zone_locations();
+                    //         $zone_shipping_methods = $zone->get_shipping_methods();
 
-                //     foreach (bbloomer_get_all_shipping_zones() as $zone) {
-                //         $zone_name = $zone->get_zone_name();
-                //         $zone_locations = $zone->get_zone_locations();
-                //         $zone_shipping_methods = $zone->get_shipping_methods();
+                    //         $is_input_location_in_zone = false;
+                    //         foreach ($zone_locations as $location) {
+                    //             if ($input_location == 'تهران') {
+                    //                 $is_input_location_in_zone = true;
+                    //                 break;
+                    //             }
+                    //         }
 
-                //         $is_input_location_in_zone = false;
-                //         foreach ($zone_locations as $location) {
-                //             if ($input_location == 'تهران') {
-                //                 $is_input_location_in_zone = true;
-                //                 break;
-                //             }
-                //         }
+                    //         foreach ($zone_shipping_methods as $method) {
+                    //             if ($is_input_location_in_zone) {
+                    //                 if (
+                    //                     $method->id === 'free_shipping' ||
+                    //                     ($method->id === 'flat_rate' && $method->title === 'ارسال توربو') ||
+                    //                     ($method->id === 'flat_rate' && $method->title === 'ارسال عادی')
+                    //                 ) {
+                    //                     $filtered_shipping_methods[] = [
+                    //                         'Zone Name' => $zone_name,
+                    //                         'Method ID' => $method->id,
+                    //                         'Title' => $method->title,
+                    //                         'Enabled' => $method->enabled === 'yes' ? 'Yes' : 'No',
+                    //                         'Cost' => isset($method->cost) ? $method->cost : 'Free',
+                    //                         'Settings' => $method->settings,
+                    //                     ];
+                    //                 }
+                    //             } else {
+                    //                 if (
+                    //                     $method->id === 'free_shipping' ||
+                    //                     $method->id === 'post'
+                    //                 ) {
+                    //                     $filtered_shipping_methods[] = [
+                    //                         'Zone Name' => $zone_name,
+                    //                         'Method ID' => $method->id,
+                    //                         'Title' => $method->title,
+                    //                         'Enabled' => $method->enabled === 'yes' ? 'Yes' : 'No',
+                    //                         'Cost' => isset($method->cost) ? $method->cost : 'Free',
+                    //                         'Settings' => $method->settings,
+                    //                     ];
+                    //                 }
+                    //             }
+                    //         }
+                    //     }
 
-                //         foreach ($zone_shipping_methods as $method) {
-                //             if ($is_input_location_in_zone) {
-                //                 if (
-                //                     $method->id === 'free_shipping' ||
-                //                     ($method->id === 'flat_rate' && $method->title === 'ارسال توربو') ||
-                //                     ($method->id === 'flat_rate' && $method->title === 'ارسال عادی')
-                //                 ) {
-                //                     $filtered_shipping_methods[] = [
-                //                         'Zone Name' => $zone_name,
-                //                         'Method ID' => $method->id,
-                //                         'Title' => $method->title,
-                //                         'Enabled' => $method->enabled === 'yes' ? 'Yes' : 'No',
-                //                         'Cost' => isset($method->cost) ? $method->cost : 'Free',
-                //                         'Settings' => $method->settings,
-                //                     ];
-                //                 }
-                //             } else {
-                //                 if (
-                //                     $method->id === 'free_shipping' ||
-                //                     $method->id === 'post'
-                //                 ) {
-                //                     $filtered_shipping_methods[] = [
-                //                         'Zone Name' => $zone_name,
-                //                         'Method ID' => $method->id,
-                //                         'Title' => $method->title,
-                //                         'Enabled' => $method->enabled === 'yes' ? 'Yes' : 'No',
-                //                         'Cost' => isset($method->cost) ? $method->cost : 'Free',
-                //                         'Settings' => $method->settings,
-                //                     ];
-                //                 }
-                //             }
-                //         }
-                //     }
+                    //     return $filtered_shipping_methods;
+                    // }
 
-                //     return $filtered_shipping_methods;
-                // }
+                    // $input_location = "تهران";
 
-                // $input_location = "تهران";
+                    // $filtered_methods = filter_shipping_methods_by_location($input_location);
 
-                // $filtered_methods = filter_shipping_methods_by_location($input_location);
-
-                // foreach ($filtered_methods as $method) {
-                //     echo "Zone Name: " . $method['Zone Name'] . "<br>";
-                //     echo "Method ID: " . $method['Method ID'] . "<br>";
-                //     echo "Title: " . $method['Title'] . "<br>";
-                //     echo "Enabled: " . $method['Enabled'] . "<br>";
-                //     echo "Cost: " . $method['Cost'] . "<br>";
-                //     echo "Settings: <pre>" . print_r($method['Settings'], true) . "</pre><br>";
-                //     echo "----------------------------------------<br>";
-                // }
-                // MD - return correct shipping methods - END
-                ?>
+                    // foreach ($filtered_methods as $method) {
+                    //     echo "Zone Name: " . $method['Zone Name'] . "<br>";
+                    //     echo "Method ID: " . $method['Method ID'] . "<br>";
+                    //     echo "Title: " . $method['Title'] . "<br>";
+                    //     echo "Enabled: " . $method['Enabled'] . "<br>";
+                    //     echo "Cost: " . $method['Cost'] . "<br>";
+                    //     echo "Settings: <pre>" . print_r($method['Settings'], true) . "</pre><br>";
+                    //     echo "----------------------------------------<br>";
+                    // }
+                    // MD - return correct shipping methods - END
+                    ?>
 
 
-                <?php
-                /**
-                 * Renders the main container for shipping methods.
-                 *
-                 * @return string The HTML structure of the main container.
-                 */
-                function render_shipping_methods_container()
-                {
-                    return '<div id="vertuka-shipping-delivery" class="choose-delivery-method checkout-choose-delivery-method py-32 my-32">' .
-                        render_shipping_title() .
-                        render_delivery_methods() .
-                        '</div>';
-                }
-
-                /**
-                 * Renders the title section of the shipping methods.
-                 *
-                 * @return string The HTML structure of the title section.
-                 */
-                function render_shipping_title()
-                {
-                    return '<div class="title"><h2>انتخاب روش ارسال</h2></div>';
-                }
-
-                /**
-                 * Renders the delivery methods section.
-                 *
-                 * @return string The HTML structure of the delivery methods.
-                 */
-                function render_delivery_methods()
-                {
-                    return '<div class="delivery-methods"><div><div class="d-flex">' .
-                        render_post_method() .
-                        render_standard_shipping_method() .
-                        render_turbo_shipping_method() .
-                        '</div></div></div>';
-                }
-
-                /**
-                 * Renders the post shipping method.
-                 *
-                 * @return string The HTML structure of the post shipping method.
-                 */
-                function render_post_method()
-                {
-                    $cart_total = WC()->cart->get_cart_contents_total();
-                    $free_shipping = ($cart_total >= 10000000) ? '<p><span class="fee">(رایگان)</span></p>' : '';
-
-                    return '<div id="vertuka_shipping_method_0_post" class="method transport active">' .
-                        '<div><div class="img-box-i d-flex justify-content-center"><img src="' . get_theme_file_uri('assets/images/post.png') . '" alt="post method"></div></div>' .
-                        '<div style="margin-top: -3px;"><div class="d-lg-block justify-content-center">' .
-                        '<p><span class="title"> پست</span></p>' .
-                        $free_shipping .
-                        '</div></div></div>';
-                }
-
-                /**
-                 * Renders the standard shipping method.
-                 *
-                 * @return string The HTML structure of the standard shipping method.
-                 */
-                function render_standard_shipping_method()
-                {
-                    $cart_total = WC()->cart->get_cart_contents_total();
-                    $free_shipping = ($cart_total >= 10000000) ? '<p><span class="fee">(رایگان)</span></p>' : '';
-
-                    return '<div id="vertuka_shipping_method_0_aady" class="method transport vertuka_shipping_method_0_aady">' .
-                        '<div><div class="img-box-i d-flex justify-content-center"><img src="' . get_theme_file_uri('assets/images/ady.png') . '" alt="post method"></div></div>' .
-                        '<div><div class="d-lg-block justify-content-center">' .
-                        '<p><span class="title"> ارسال عادی</span></p>' .
-                        $free_shipping .
-                        '</div></div></div>';
-                }
-                /**
-                 * Renders the turbo shipping method if conditions are met.
-                 *
-                 * @return string The HTML structure of the turbo shipping method or an empty string if conditions are not met.
-                 */
-                function render_turbo_shipping_method()
-                {
-                    $current_date = time();
-                    $is_holiday = IsHoliday(
-                        convert2english(jdate("Y", $current_date)),
-                        convert2english(jdate("m", $current_date)),
-                        convert2english(jdate("d", $current_date))
-                    );
-
-                    if (!$is_holiday) {
-                        $weekday = jgetdate($current_date)['weekday'];
-                        $hour = date('H');
-
-                        if (($weekday == 'پنجشنبه' && $hour < 14) || ($weekday != 'پنجشنبه' && $hour < 17)) {
-                            return '<div id="vertuka_shipping_method_0_flat_rate5" class="method transport vertuka_shipping_method_0_flat_rate5" style="margin-left: 0;">' .
-                                '<div><div class="img-box-i d-flex justify-content-center"><img src="' . get_theme_file_uri('assets/images/torbo.png') . '" alt="post method"></div></div>' .
-                                '<div><div class="d-lg-block justify-content-center">' .
-                                '<p><span class="title"> ارسال توربو</span></p>' .
-                                '<p><span class="fee">(امروز تحویل بگیرید)</span></p>' .
-                                '</div></div></div>';
-                        }
+                    <?php
+                    /**
+                     * Renders the main container for shipping methods.
+                     *
+                     * @return string The HTML structure of the main container.
+                     */
+                    function render_shipping_methods_container()
+                    {
+                        return '<div id="vertuka-shipping-delivery" class="choose-delivery-method checkout-choose-delivery-method py-32 my-32">' .
+                            render_shipping_title() .
+                            render_delivery_methods() .
+                            '</div>';
                     }
 
-                    return '';
-                }
+                    /**
+                     * Renders the title section of the shipping methods.
+                     *
+                     * @return string The HTML structure of the title section.
+                     */
+                    function render_shipping_title()
+                    {
+                        return '<div class="title"><h2>انتخاب روش ارسال</h2></div>';
+                    }
 
-                ?>
+                    /**
+                     * Renders the delivery methods section.
+                     *
+                     * @return string The HTML structure of the delivery methods.
+                     */
+                    function render_delivery_methods()
+                    {
+                        return '<div class="delivery-methods"><div><div class="d-flex">' .
+                            render_post_method() .
+                            render_standard_shipping_method() .
+                            render_turbo_shipping_method() .
+                            '</div></div></div>';
+                    }
 
-                <!-- MD - print shipping methodes - START -->
-                <?php echo render_shipping_methods_container();
-                ?>
-                <!-- MD - print shipping methodes - END -->
+                    /**
+                     * Renders the post shipping method.
+                     *
+                     * @return string The HTML structure of the post shipping method.
+                     */
+                    function render_post_method()
+                    {
+                        $cart_total = WC()->cart->get_cart_contents_total();
+                        $free_shipping = ($cart_total >= 10000000) ? '<p><span class="fee">(رایگان)</span></p>' : '';
+
+                        return '<div id="vertuka_shipping_method_0_post" class="method transport active">' .
+                            '<div><div class="img-box-i d-flex justify-content-center"><img src="' . get_theme_file_uri('assets/images/post.png') . '" alt="post method"></div></div>' .
+                            '<div style="margin-top: -3px;"><div class="d-lg-block justify-content-center">' .
+                            '<p><span class="title"> پست</span></p>' .
+                            $free_shipping .
+                            '</div></div></div>';
+                    }
+
+                    /**
+                     * Renders the standard shipping method.
+                     *
+                     * @return string The HTML structure of the standard shipping method.
+                     */
+                    function render_standard_shipping_method()
+                    {
+                        $cart_total = WC()->cart->get_cart_contents_total();
+                        $free_shipping = ($cart_total >= 10000000) ? '<p><span class="fee">(رایگان)</span></p>' : '';
+
+                        return '<div id="vertuka_shipping_method_0_aady" class="method transport vertuka_shipping_method_0_aady">' .
+                            '<div><div class="img-box-i d-flex justify-content-center"><img src="' . get_theme_file_uri('assets/images/ady.png') . '" alt="post method"></div></div>' .
+                            '<div><div class="d-lg-block justify-content-center">' .
+                            '<p><span class="title"> ارسال عادی</span></p>' .
+                            $free_shipping .
+                            '</div></div></div>';
+                    }
+                    /**
+                     * Renders the turbo shipping method if conditions are met.
+                     *
+                     * @return string The HTML structure of the turbo shipping method or an empty string if conditions are not met.
+                     */
+                    function render_turbo_shipping_method()
+                    {
+                        $current_date = time();
+                        $is_holiday = IsHoliday(
+                            convert2english(jdate("Y", $current_date)),
+                            convert2english(jdate("m", $current_date)),
+                            convert2english(jdate("d", $current_date))
+                        );
+
+                        if (!$is_holiday) {
+                            $weekday = jgetdate($current_date)['weekday'];
+                            $hour = date('H');
+
+                            if (($weekday == 'پنجشنبه' && $hour < 14) || ($weekday != 'پنجشنبه' && $hour < 17)) {
+                                return '<div id="vertuka_shipping_method_0_flat_rate5" class="method transport vertuka_shipping_method_0_flat_rate5" style="margin-left: 0;">' .
+                                    '<div><div class="img-box-i d-flex justify-content-center"><img src="' . get_theme_file_uri('assets/images/torbo.png') . '" alt="post method"></div></div>' .
+                                    '<div><div class="d-lg-block justify-content-center">' .
+                                    '<p><span class="title"> ارسال توربو</span></p>' .
+                                    '<p><span class="fee">(امروز تحویل بگیرید)</span></p>' .
+                                    '</div></div></div>';
+                            }
+                        }
+
+                        return '';
+                    }
+
+                    ?>
+
+                    <!-- MD - print shipping methodes - START -->
+                    <?php echo render_shipping_methods_container();
+                    ?>
+                    <!-- MD - print shipping methodes - END -->
 
 
-                <div id="vertuka-time-delivery" class="choose-delivery-method-timeline mb-4 d-none">
-                    <div class="title">
-                        <h2>انتخاب زمان دریافت</h2>
-                    </div>
-                    <div class="delivery-methods">
-                        <div>
-                            <div class="d-flex">
-                                <?php
-                                $current_date = time();
-                                $i = 0;
+                    <div id="vertuka-time-delivery" class="choose-delivery-method-timeline mb-4 d-none">
+                        <div class="title">
+                            <h2>انتخاب زمان دریافت</h2>
+                        </div>
+                        <div class="delivery-methods">
+                            <div>
+                                <div class="d-flex">
+                                    <?php
+                                    $current_date = time();
+                                    $i = 0;
 
-                                while ($i < 3) {
-                                    $current_date = strtotime('+1 day', $current_date);
-                                    date_default_timezone_set('Asia/Tehran');
+                                    while ($i < 3) {
+                                        $current_date = strtotime('+1 day', $current_date);
+                                        date_default_timezone_set('Asia/Tehran');
 
-                                    if (!IsHoliday(convert2english(jdate("Y", $current_date)), convert2english(jdate("m", $current_date)), convert2english(jdate("d", $current_date)))) {
-                                        $i++; ?>
-                                        <div class="col-4 <?php if ($i == 1) {
-                                                                echo 'pl-2 ';
-                                                            } ?>
+                                        if (!IsHoliday(convert2english(jdate("Y", $current_date)), convert2english(jdate("m", $current_date)), convert2english(jdate("d", $current_date)))) {
+                                            $i++; ?>
+                                            <div class="col-4 <?php if ($i == 1) {
+                                                                    echo 'pl-2 ';
+                                                                } ?>
                                                                         <?php if ($i == 2) {
                                                                             echo 'px-1 dactive';
                                                                         } ?>
@@ -1036,59 +1029,59 @@ if (!is_user_logged_in()) {
                                                                             echo 'pr-2 ';
                                                                         } ?>
                                                                         "
-                                            <?php if ($i == 3) {
-                                                echo 'style="margin-left: 0;"';
-                                            } ?>>
-                                            <div class="method" <?php if ((int)date('Hi') >= 1430 && $i == 1) {
-                                                                    echo 'style="display: none;"';
-                                                                } ?>>
-                                                <div>
+                                                <?php if ($i == 3) {
+                                                    echo 'style="margin-left: 0;"';
+                                                } ?>>
+                                                <div class="method" <?php if ((int)date('Hi') >= 1430 && $i == 1) {
+                                                                        echo 'style="display: none;"';
+                                                                    } ?>>
                                                     <div>
-                                                        <p><?php echo vertuka_jalali_convert_week_name(date('D', $current_date)); ?></p>
+                                                        <div>
+                                                            <p><?php echo vertuka_jalali_convert_week_name(date('D', $current_date)); ?></p>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div>
-                                                    <p class="m-0">
-                                                        <span class="title">
-                                                            <?php echo vertuka_the_persian_number(jdate('d F Y', $current_date)) ?>
-                                                        </span>
-                                                    </p>
-                                                </div>
-
-                                                <div class="mb-1">
-                                                    <div class="ms-auto">
-                                                        <p>
-                                                            <input class="form-check-input MJ-selected-method-date-time" type="hidden" name="MJ-selected-method-date-time" value="ساعت 15-9-<?php echo vertuka_the_persian_number(jdate('y/m/d', $current_date)) ?>">
-                                                            ساعت 15-9
+                                                    <div>
+                                                        <p class="m-0">
+                                                            <span class="title">
+                                                                <?php echo vertuka_the_persian_number(jdate('d F Y', $current_date)) ?>
+                                                            </span>
                                                         </p>
                                                     </div>
+
+                                                    <div class="mb-1">
+                                                        <div class="ms-auto">
+                                                            <p>
+                                                                <input class="form-check-input MJ-selected-method-date-time" type="hidden" name="MJ-selected-method-date-time" value="ساعت 15-9-<?php echo vertuka_the_persian_number(jdate('y/m/d', $current_date)) ?>">
+                                                                ساعت 15-9
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
                                                 </div>
-
                                             </div>
-                                        </div>
-                                <?php
+                                    <?php
+                                        }
                                     }
-                                }
-                                ?>
+                                    ?>
 
-                            </div>
+                                </div>
 
 
-                            <div class="d-flex">
-                                <?php
-                                $current_date = time();
-                                $i = 0;
+                                <div class="d-flex">
+                                    <?php
+                                    $current_date = time();
+                                    $i = 0;
 
-                                while ($i < 3) {
-                                    $current_date = strtotime('+1 day', $current_date);
-                                    date_default_timezone_set('Asia/Tehran');
+                                    while ($i < 3) {
+                                        $current_date = strtotime('+1 day', $current_date);
+                                        date_default_timezone_set('Asia/Tehran');
 
-                                    if (!IsHoliday(convert2english(jdate("Y", $current_date)), convert2english(jdate("m", $current_date)), convert2english(jdate("d", $current_date)))) {
-                                        // if (0) {
-                                        $i++; ?>
-                                        <div class="col-4 <?php if ($i == 1) {
-                                                                echo 'pl-2 ';
-                                                            } ?>
+                                        if (!IsHoliday(convert2english(jdate("Y", $current_date)), convert2english(jdate("m", $current_date)), convert2english(jdate("d", $current_date)))) {
+                                            // if (0) {
+                                            $i++; ?>
+                                            <div class="col-4 <?php if ($i == 1) {
+                                                                    echo 'pl-2 ';
+                                                                } ?>
                                                                         <?php if ($i == 2) {
                                                                             echo 'px-1 dactive';
                                                                         } ?>
@@ -1096,120 +1089,120 @@ if (!is_user_logged_in()) {
                                                                             echo 'pr-2 ';
                                                                         } ?>
                                                                         "
-                                            <?php if ($i == 3) {
-                                                echo 'style="margin-left: 0;"';
-                                            } ?>>
-                                            <div class="method">
-                                                <div>
+                                                <?php if ($i == 3) {
+                                                    echo 'style="margin-left: 0;"';
+                                                } ?>>
+                                                <div class="method">
                                                     <div>
-                                                        <p><?php echo vertuka_jalali_convert_week_name(date('D', $current_date)); ?></p>
+                                                        <div>
+                                                            <p><?php echo vertuka_jalali_convert_week_name(date('D', $current_date)); ?></p>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div>
-                                                    <p class="m-0">
-                                                        <span class="title">
-                                                            <?php echo vertuka_the_persian_number(jdate('d F Y', $current_date)) ?>
-                                                        </span>
-                                                    </p>
-                                                </div>
-
-                                                <div class="mb-1">
-                                                    <div class="ms-auto">
-                                                        <p>
-                                                            <input class="form-check-input MJ-selected-method-date-time" type="hidden" name="MJ-selected-method-date-time" value="ساعت 21-15-<?php echo vertuka_the_persian_number(jdate('y/m/d', $current_date)) ?>">
-                                                            ساعت 21-15
+                                                    <div>
+                                                        <p class="m-0">
+                                                            <span class="title">
+                                                                <?php echo vertuka_the_persian_number(jdate('d F Y', $current_date)) ?>
+                                                            </span>
                                                         </p>
                                                     </div>
-                                                </div>
 
+                                                    <div class="mb-1">
+                                                        <div class="ms-auto">
+                                                            <p>
+                                                                <input class="form-check-input MJ-selected-method-date-time" type="hidden" name="MJ-selected-method-date-time" value="ساعت 21-15-<?php echo vertuka_the_persian_number(jdate('y/m/d', $current_date)) ?>">
+                                                                ساعت 21-15
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
                                             </div>
-                                        </div>
-                                <?php
+                                    <?php
+                                        }
                                     }
-                                }
-                                ?>
+                                    ?>
+
+                                </div>
 
                             </div>
 
                         </div>
-
                     </div>
-                </div>
 
-                <!-- mj coupon -->
-                <div id="mj-coupon-container" class="mb-4 mj-checkout_coupon-form">
-                    <a href="#" class="showcoupon text-black">
-                        <div class="woocommerce-form-coupon-toggle-mj">
-                            <i>
-                                <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M10 16H38V32C38 35.7712 38 37.6569 36.8284 38.8284C35.6569 40 33.7712 40 30 40H18C14.2288 40 12.3431 40 11.1716 38.8284C10 37.6569 10 35.7712 10 32V16Z" fill="#D8D8D8" />
-                                    <path d="M24 16L23.5216 11.6942C23.2246 9.02178 20.9345 7 18.2456 7V7C15.3676 7 13 9.33309 13 12.2111V12.2111C13 13.9535 13.8708 15.5805 15.3205 16.547L19 19" stroke="#515151" stroke-width="2" stroke-linecap="round" />
-                                    <path d="M24 16L24.4784 11.6942C24.7754 9.02178 27.0655 7 29.7544 7V7C32.6324 7 35 9.33309 35 12.2111V12.2111C35 13.9535 34.1292 15.5805 32.6795 16.547L29 19" stroke="#515151" stroke-width="2" stroke-linecap="round" />
-                                    <rect x="8" y="16" width="32" height="6" rx="2" fill="#515151" />
-                                    <path d="M24 22V30" stroke="#515151" stroke-width="2" stroke-linecap="round" />
-                                </svg>
-                            </i>
-                            <span class="woocommerce-info-MJ">
-                                آیا کد تخفیف دارید؟
-                            </span>
-                        </div>
-                    </a>
+                    <!-- mj coupon -->
+                    <div id="mj-coupon-container" class="mb-4 mj-checkout_coupon-form">
+                        <a href="#" class="showcoupon text-black">
+                            <div class="woocommerce-form-coupon-toggle-mj">
+                                <i>
+                                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M10 16H38V32C38 35.7712 38 37.6569 36.8284 38.8284C35.6569 40 33.7712 40 30 40H18C14.2288 40 12.3431 40 11.1716 38.8284C10 37.6569 10 35.7712 10 32V16Z" fill="#D8D8D8" />
+                                        <path d="M24 16L23.5216 11.6942C23.2246 9.02178 20.9345 7 18.2456 7V7C15.3676 7 13 9.33309 13 12.2111V12.2111C13 13.9535 13.8708 15.5805 15.3205 16.547L19 19" stroke="#515151" stroke-width="2" stroke-linecap="round" />
+                                        <path d="M24 16L24.4784 11.6942C24.7754 9.02178 27.0655 7 29.7544 7V7C32.6324 7 35 9.33309 35 12.2111V12.2111C35 13.9535 34.1292 15.5805 32.6795 16.547L29 19" stroke="#515151" stroke-width="2" stroke-linecap="round" />
+                                        <rect x="8" y="16" width="32" height="6" rx="2" fill="#515151" />
+                                        <path d="M24 22V30" stroke="#515151" stroke-width="2" stroke-linecap="round" />
+                                    </svg>
+                                </i>
+                                <span class="woocommerce-info-MJ">
+                                    آیا کد تخفیف دارید؟
+                                </span>
+                            </div>
+                        </a>
 
-                    <form class="checkout_coupon woocommerce-form-coupon" method="post" style="display:none">
-                        <div class="d-md-flex">
-                            <div class="mobile-w-100 mt-1 mb-3"><input type="text" name="coupon_code" class="mj-coupon-input mobile-w-100" placeholder="<?php esc_attr_e('Coupon code', 'woocommerce'); ?>" id="coupon_code"></div>
-                            <div class="mobile-w-100 m-1 text-center mt-1"><input type="submit" name="apply_coupon" class="button bg-success text-white box-shadow-none border-0" value="<?php esc_attr_e('Apply coupon', 'woocommerce'); ?>"></div>
-                        </div>
+                        <form class="checkout_coupon woocommerce-form-coupon" method="post" style="display:none">
+                            <div class="d-md-flex">
+                                <div class="mobile-w-100 mt-1 mb-3"><input type="text" name="coupon_code" class="mj-coupon-input mobile-w-100" placeholder="<?php esc_attr_e('Coupon code', 'woocommerce'); ?>" id="coupon_code"></div>
+                                <div class="mobile-w-100 m-1 text-center mt-1"><input type="submit" name="apply_coupon" class="button bg-success text-white box-shadow-none border-0" value="<?php esc_attr_e('Apply coupon', 'woocommerce'); ?>"></div>
+                            </div>
 
-                        <div class="clear"></div>
-                    </form>
-                </div>
-
-
-                <div id="vertuka-order-type" class="choose-delivery-method pt-4">
-                    <div class="title">
-                        <h2>نوع خرید</h2>
+                            <div class="clear"></div>
+                        </form>
                     </div>
-                    <div class="option-to-buy">
-                        <div class="vertuka-insurance-option">
-                            <div class="d-flex">
-                                <div class="d-flex ml-12">
+
+
+                    <div id="vertuka-order-type" class="choose-delivery-method pt-4">
+                        <div class="title">
+                            <h2>نوع خرید</h2>
+                        </div>
+                        <div class="option-to-buy">
+                            <div class="vertuka-insurance-option">
+                                <div class="d-flex">
+                                    <div class="d-flex ml-12">
+                                        <div>
+                                            <p class="insurance-text" style="line-height: 40px;">خرید حقوقی</p>
+                                        </div>
+                                    </div>
+
                                     <div>
-                                        <p class="insurance-text" style="line-height: 40px;">خرید حقوقی</p>
+                                        <div class="vertuka-checkbox"><span></span></div>
                                     </div>
                                 </div>
-
-                                <div>
-                                    <div class="vertuka-checkbox"><span></span></div>
-                                </div>
+                                <p class="mj-hoghoghy-force d-none"><?php
+                                                                    if (
+                                                                        get_user_meta(get_current_user_id(), 'company', true) != ''
+                                                                        && get_user_meta(get_current_user_id(), 'economic_id', true) != ''
+                                                                        && get_user_meta(get_current_user_id(), 'company_national_code', true) != ''
+                                                                        && get_user_meta(get_current_user_id(), 'registration_id', true) != ''
+                                                                        && get_user_meta(get_current_user_id(), 'company_address', true) != ''
+                                                                    ) {
+                                                                        echo 'no';
+                                                                    } else {
+                                                                        echo 'لطفا اطلاعات حقوقی خود را در <a href="/my-account/vertuka-account-detail/" style="color: red;text-decoration: underline;">پروفایل کاربری</a> تکمیل کنید.';
+                                                                    }
+                                                                    ?></p>
                             </div>
-                            <p class="mj-hoghoghy-force d-none"><?php
-                                                                if (
-                                                                    get_user_meta(get_current_user_id(), 'company', true) != ''
-                                                                    && get_user_meta(get_current_user_id(), 'economic_id', true) != ''
-                                                                    && get_user_meta(get_current_user_id(), 'company_national_code', true) != ''
-                                                                    && get_user_meta(get_current_user_id(), 'registration_id', true) != ''
-                                                                    && get_user_meta(get_current_user_id(), 'company_address', true) != ''
-                                                                ) {
-                                                                    echo 'no';
-                                                                } else {
-                                                                    echo 'لطفا اطلاعات حقوقی خود را در <a href="/my-account/vertuka-account-detail/" style="color: red;text-decoration: underline;">پروفایل کاربری</a> تکمیل کنید.';
-                                                                }
-                                                                ?></p>
                         </div>
                     </div>
                 </div>
+
             </div>
 
+            <div class="express-cart-price-box">
+                <?php the_content(); ?>
+            </div>
         </div>
-
-        <div class="express-cart-price-box">
-            <?php the_content(); ?>
-        </div>
-</div>
-<?php
+    <?php
     }
-?>
+    ?>
 
 
 </div>
