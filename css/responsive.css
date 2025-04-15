@@ -1340,7 +1340,7 @@
   }
   .delivery-methods .method {
     margin-left: 4px !important;
-    padding: 5px 5px;
+    padding: 10px 10px;
     flex-grow: 1;
     text-align: center;
   }
