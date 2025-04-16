@@ -1417,31 +1417,14 @@ if (!function_exists('vertuka_user_meta_fb')) {
 
 
             foreach ($data_hoghoghi as $field => $label) {
-
                 $old_data = get_user_meta($user_id, $field, true);
-
             ?>
-
                 <p class="vertuka_fields_gp hoghoghi " <?php if ($show_hoghoghi == '') { ?>style="display: none" <?php } ?>>
-
                     <label><?php echo $label; ?></label>
-
                     <input type="text" name="<?php echo $field; ?>" value="<?php echo $old_data ?>">
-
                 </p>
-
             <?php
-
-
-
             }
-
-
-
-
-
-
-
             ?>
 
             <p class="vertuka_fields_gp">
