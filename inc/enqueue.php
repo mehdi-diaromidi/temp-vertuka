@@ -167,6 +167,14 @@ if (!class_exists('Vertuka_Enqueue')) {
             );
 
             wp_enqueue_script(
+                'checkout-ajax-script',
+                get_template_directory_uri() . '/js/checkout-ajax.js',
+                array('jquery'),
+                null,
+                true
+            );
+
+            wp_enqueue_script(
                 'jquery-datatable',
                 $this->asset_js('jquery.datatables.min.js'),
                 array('jquery', 'bootstrap'),

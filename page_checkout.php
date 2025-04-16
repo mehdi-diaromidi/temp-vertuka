@@ -997,8 +997,7 @@ if (!is_user_logged_in()) {
                     ?>
 
                     <!-- MD - print shipping methodes - START -->
-                    <?php echo render_shipping_methods_container();
-                    ?>
+                    <?php echo render_shipping_methods_container(); ?>
                     <!-- MD - print shipping methodes - END -->
 
 
@@ -1296,9 +1295,6 @@ if (!is_user_logged_in()) {
         margin-bottom: 16px;
     }
 
-    .vertuka-order-details .cart-box .item {}
-
-    .vertuka-order-details .cart-box .item .title {}
 
     .woocommerce-Price-currencySymbol {
         margin-right: 5px;
