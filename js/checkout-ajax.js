@@ -1,32 +1,60 @@
-jQuery(document).ready(function ($) {
-  if ($('body').hasClass('woocommerce-checkout')) {
-    const fields = ['#addresspress-first-name', '#addresspress-last-name', '#addresspress-phone'];
 
-    $('#addresspress-check-receiver').on('change', function () {
-      const isChecked = $(this).is(':checked');
-      const userFirstName = $('#addresspress-title').data('user-first_name');
-      const userLastName = $('#addresspress-title').data('user-last_name');
-      const userPhoneNumber = $('#addresspress-title').data('user-phone_number');
+jQuery(document).ready(function($) {
 
-      // Loop through fields to apply changes
-      fields.forEach((field) => {
-        const $field = $(field);
+    $('#addresspress-check-receiver').on('change', function() {
+        var firstName = $('#addresspress-title').data('user-first_name');
+        var lastName = $('#addresspress-title').data('user-last_name');
+        var phone = $('#addresspress-title').data('user-phone_number');
 
-        if (isChecked) {
-          // Set values and disable fields
-          if ($field.is('#addresspress-first-name')) {
-            $field.val(userFirstName);
-          } else if ($field.is('#addresspress-last-name')) {
-            $field.val(userLastName);
-          } else if ($field.is('#addresspress-phone')) {
-            $field.val(userPhoneNumber);
-          }
+        var fields = [
+            {selector: '#addresspress-first-name', value: firstName},
+            {selector: '#addresspress-last-name', value: lastName},
+            {selector: '#addresspress-phone', value: phone}
+        ];
 
-          $field.addClass('save-addr-lower-color').prop('readonly', true).prop('disabled', true);
+        if ($(this).is(':checked')) {
+            fields.forEach(function(field) {
+                $(field.selector).closest('.mb-4').hide().fadeIn(300);
+            });
+
+            function fillField(index) {
+                if (index >= fields.length) return;
+
+                var field = $(fields[index].selector);
+                var value = fields[index].value;
+
+                field.prop('disabled', false).prop('readonly', false).removeClass('save-addr-lower-color');
+
+                field.focus();
+                field.val(value);
+
+                var domInput = field[0];
+                domInput.selectionStart = domInput.selectionEnd = domInput.value.length;
+
+                setTimeout(function() {
+                    field.blur();
+
+                    field.addClass('save-addr-lower-color').prop('readonly', true);
+
+                    setTimeout(function() {
+                        fillField(index + 1);
+                    }, 200);
+                }, 400);
+            }
+
+            fillField(0);
         } else {
-          $field.val('').removeClass('save-addr-lower-color').prop('readonly', false).prop('disabled', false);
+            fields.forEach(function(field) {
+                var fieldElement = $(field.selector);
+                fieldElement
+                    .val('')
+                    .removeClass('save-addr-lower-color')
+                    .prop('readonly', false);
+
+                fieldElement.closest('.mb-4').fadeOut(100).fadeIn(100);
+            });
         }
-      });
     });
-  }
+
 });
+

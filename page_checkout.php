@@ -719,6 +719,24 @@ if (!is_user_logged_in()) {
                         </div>
                     </div>
                 </div>
+                <style>
+                    @keyframes scaleFadeIn {
+                        0% {
+                            opacity: 0;
+                            transform: scale(0.9);
+                        }
+
+                        100% {
+                            opacity: 1;
+                            transform: scale(1);
+                        }
+                    }
+
+                    .addresspress-animated {
+                        animation: scaleFadeIn 0.3s ease-in-out;
+                    }
+                </style>
+
 
                 <div class="cart-content">
                     <div class="py-2">

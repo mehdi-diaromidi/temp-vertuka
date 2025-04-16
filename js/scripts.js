@@ -1074,16 +1074,6 @@
 
     $("#ship-to-different-address-checkbox").prop("checked", true).change();
 
-    $(".add-address-lightbox .remove-item").on("click", function (e) {
-      $(".page-checkout-wrapper.add-address-lightbox")
-        .css("position", "inherit")
-        .css("z-index", "inherit");
-      $(".progressbar-box.add-address-lightbox").css("z-index", "inherit");
-      $(".warning-login.add-address-lightbox").addClass("d-none");
-      map.resize();
-      mapEdit.resize();
-    });
-
     $("#vertuka-address-delivery").on("click", ".method", function () {
       var element = $(this);
       $("#vertuka-address-delivery .delivery-methods .method").removeClass(

@@ -132,7 +132,7 @@ if (!class_exists('Vertuka_Enqueue')) {
         {
 
             // for prevent cash
-            $randomNumber = '2.2.73';
+            $randomNumber = '2.2.74';
 
             wp_enqueue_script(
                 'bootstrap',
