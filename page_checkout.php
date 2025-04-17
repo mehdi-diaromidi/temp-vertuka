@@ -438,64 +438,90 @@ if (!is_user_logged_in()) {
                     var ajaxurl = '<?php echo admin_url('admin-ajax.php'); ?>';
 
                     $("#med_registerpress_nationalcode_button").on("click", function(e) {
-
-                        // Prevent the default form submission
                         e.preventDefault();
 
-                        $('#alert-national-code').removeClass('d-none');
-                        $('#alert-national-code .general').removeClass('d-none');
-                        $('.formNationalCode').addClass('d-none');
 
-                        // Get the value of the national_code input
+                        $('#alert-national-code').removeClass('d-none');
+
                         var nationalCodeValue = $("#national_code").val();
                         var name = $("#f_name_user").val();
                         var family = $("#l_name_user").val();
 
-
-                        // Perform AJAX request to save the national_code
-                        if (nationalCodeValue.length == 10 && name != '' && family != '') {
+                        // Show general message if conditions are met
+                        if (nationalCodeValue.length === 10 && name !== '' && family !== '') {
+                            $('#alert-national-code .general').removeClass('d-none');
                             $('#alert-national-code .f-error').addClass('d-none');
-                            $.ajax({
-                                type: "POST",
-                                url: ajaxurl, // Assuming ajaxurl is defined in your WordPress environment
-                                data: {
-                                    action: "save_national_code",
-                                    national_code: nationalCodeValue,
-                                    name: name,
-                                    family: family
-                                },
-                                success: function(response) {
-                                    $('#alert-national-code .general').fadeOut(50);
-                                    $('#alert-national-code .success').delay(1500).removeClass('d-none');
+                            $('#alert-national-code .error').addClass('d-none');
+                            $('#alert-national-code .server-error').addClass('d-none');
+                            $('#alert-national-code .success').addClass('d-none');
+                            $('#alert-national-code .too-muche-error').addClass('d-none');
 
+                            // Prepare data for AJAX request
+                            var data = {
+                                action: 'verify_national_id',
+                                national_code: nationalCodeValue,
+                                name: name,
+                                family: family,
+                                security: '<?php echo wp_create_nonce("verify_national_id_nonce"); ?>'
+                            };
+
+                            $.post('<?php echo admin_url('admin-ajax.php'); ?>', data, function(response) {
+                                $('#alert-national-code').removeClass('d-none');
+                                $('#alert-national-code .general').addClass('d-none');
+
+                                if (response.success) {
+                                    $('#alert-national-code .success').removeClass('d-none').hide().fadeIn(300);
                                     setTimeout(function() {
-                                        $('.warning-login.national-code').addClass('d-none');
-                                    }, 2000);
-
-                                    var storedData = JSON.parse(localStorage.getItem('userData')) || [];
-
-                                    var newUser = {
-                                        national_code: nationalCodeValue,
-                                        name: name,
-                                        family: family
-                                    };
-                                    storedData.push(newUser);
-
-                                    localStorage.setItem('userData', JSON.stringify(storedData));
-                                },
-                                error: function(error) {
-                                    $('#alert-national-code .general').fadeOut(50);
-                                    $('.formNationalCode').removeClass('d-none');
-                                    $('#alert-national-code .error').removeClass('d-none');
+                                        location.reload();
+                                    }, 1000);
+                                } else {
+                                    console.log('API Response:', response.data.api_response); // Log API response for debugging
+                                    if (response.data.type === 'error') {
+                                        $('#alert-national-code .error').removeClass('d-none').hide().fadeIn(300);
+                                    } else if (response.data.type === 'server-error') {
+                                        $('#alert-national-code .server-error').removeClass('d-none').hide().fadeIn(300);
+                                    } else if (response.data.type === 'too-much-error') {
+                                        $('#alert-national-code .too-much-error').removeClass('d-none').hide().fadeIn(300);
+                                        startCountdown();
+                                    } else if (response.data.type === 'f-error') {
+                                        $('#alert-national-code .f-error').removeClass('d-none').hide().fadeIn(300);
+                                    }
                                 }
                             });
                         } else {
-                            $('#alert-national-code').addClass('mt-3');
-                            $('#alert-national-code .general').addClass('d-none');
-                            $('#alert-national-code .f-error').removeClass('d-none');
-                            $('.formNationalCode').removeClass('d-none');
+                            $('#alert-national-code .f-error').removeClass('d-none').hide().fadeIn(300);
                         }
                     });
+
+                    function startCountdown() {
+                        var countdown = 300; // 5 minutes in seconds
+                        var interval = setInterval(function() {
+                            var minutes = Math.floor(countdown / 60);
+                            var seconds = countdown % 60;
+                            $('#tiles .minutes').text(minutes < 10 ? '0' + minutes : minutes);
+                            $('#tiles .seconds').text(seconds < 10 ? '0' + seconds : seconds);
+                            countdown--;
+
+                            if (countdown < 0) {
+                                clearInterval(interval);
+                                $('.counter-box').remove();
+                            }
+                        }, 1000);
+
+                        $('.med-form-container').after(`
+                            <div class="counter-box">
+                                <div class="med-rp-counter">
+                                    <div id="tiles" class="tiles">
+                                        <span class="seconds">00</span>:<span class="minutes">05</span>
+                                    </div>
+                                    <div class="labels">
+                                        <span>ثانیه</span>
+                                        <span>دقیقه</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `);
+                    }
                 });
             })(jQuery);
         </script>
@@ -523,6 +549,12 @@ if (!is_user_logged_in()) {
 
         .warning-login .login-box-modal .title-box {
             background: #E8E8E8;
+        }
+
+        #alert-national-code {
+            margin-top: 10px;
+            border-radius:
+                15px;
         }
 
         .warning-login .login-box-modal .content-box {
@@ -612,15 +644,12 @@ if (!is_user_logged_in()) {
                                     <button id="med_registerpress_nationalcode_button" class="w-100" style="background-color: #1f9a17">ثبت</button>
                                 </div>
                             </form>
-                            <!-- <div id="alert-national-code" class="alert bg-light d-none">
-                                <p class="general text-muted m-0 d-none">در حال بررسی اطلاعات وارد شده...</p>
-                                <p class="result_user_data m-0 d-none">میخواهم پیغام در اینجا نمایش داده شود</p>
-                            </div> -->
                             <div id="alert-national-code" class="alert bg-light d-none">
                                 <p class="general text-muted m-0 d-none">در حال بررسی اطلاعات وارد شده...</p>
                                 <p class="success text-success m-0 d-none">اطلاعات شما با موفقیت ثبت گردید</p>
                                 <p class="error text-danger m-0 d-none">کد ملی وارد شده با شماره تماس مطابقت ندارد!</p>
-                                <!-- <p class="error-2-4 text-danger m-0 d-none">خطا در برقراری با سرویس</p> -->
+                                <p class="server-error text-danger m-0 d-none">در حال حاضر اعتبارسنجی کد ملی امکان پذیر نیست!</p>
+                                <p class="too-much-error text-danger m-0 d-none">تعداد درخواست‌های شما بیش از حد می‌باشد، لطفا 5 دقیقه دیگر دوباره تلاش کنید</p>
                                 <p class="f-error text-danger m-0 d-none">لطفا فرم را کامل کنید و کد ملی معتبر وارد کنید.</p>
                             </div>
                         </div>

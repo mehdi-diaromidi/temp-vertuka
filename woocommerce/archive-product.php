@@ -209,7 +209,11 @@ $category_id = is_tax() ? get_queried_object()->term_id : '';
 												</p>
 											</div>
 											<div id="sort-product-by" class="d-flex flex-row-reverse flex-wrap justify-content-between justify-content-md-end">
-												<?php $active = $_GET['orderby']; ?>
+												<?php
+												if (isset($_GET['orderby'])) {
+													$active = $_GET['orderby'];
+												}
+												?>
 												<div class="me-0 me-md-1 mb-2 mb-sm-0 <?php if ($active == 'popularity') {
 																							echo 'active';
 																						} ?>">

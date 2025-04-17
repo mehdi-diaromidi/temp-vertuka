@@ -31,7 +31,7 @@ if (!class_exists('Vertuka_Enqueue')) {
         {
 
             // for prevent cash
-            $randomNumber = '2.3.02';
+            $randomNumber = '2.3.03';
 
             // Enqueue Bootstrap CSS from CDN
 

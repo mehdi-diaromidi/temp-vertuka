@@ -328,80 +328,79 @@
             <div class="owl-carousel owl-theme">
 
                 <?php
+                // MJ cache it for 15min thus to faster load
+                // if(1){
+                if (time() > filemtime(wp_upload_dir()['basedir'] . "/" . date("Y") . "/" . date("m") . "/home-carousel.html") + (60 * 15)) {
+                    wp_delete_file(wp_upload_dir()['basedir'] . "/" . date("Y") . "/" . date("m") . "/home-carousel.html");
+                    // WP_Query arguments
+                    $args2 = array(
+                        'post_type' => array('product', 'product_variation'),
+                        'posts_per_page' => 20,
+                        'meta_query' => array(
+                            //PRICE
+                            array(
+                                'key' => '_sale_price',
+                                'value' => 0,
+                                'compare' => '>='
+                            ),
+                        )
+                    );
 
-function vertuka_render_home_carousel_cached()
-{
-    $cache_key = 'vertuka_home_carousel';
-    $cached_data = get_transient($cache_key);
+                    // The Query
+                    $product_query = new WP_Query($args2);
 
-    if ($cached_data !== false) {
-        echo $cached_data;
-        return;
-    }
+                    $productsIds = array(); // store product id for avoid duplication.
+                    $data = '';
+                    if (count($product_query->posts)) {
+                        foreach ($product_query->posts as $variation_id) {
 
-    // اگر کش وجود ندارد، کوئری محصولات را اجرا کن
-    $args = array(
-        'post_type' => array('product', 'product_variation'),
-        'posts_per_page' => 20,
-        'meta_query' => array(
-            array(
-                'key' => '_sale_price',
-                'value' => 0,
-                'compare' => '>='
-            ),
-        )
-    );
+                            $variation = wc_get_product($variation_id);
+                            // var_dump($variation->get_status());
+                            if ($variation->get_stock_quantity() && $variation->get_status() == 'publish') {
+                                $product   = wc_get_product($variation->get_parent_id());
 
-    $product_query = new WP_Query($args);
-    $productsIds = array();
-    $data = '';
+                                if (!in_array($product->get_id(), $productsIds) && $product) {
+                                    $productsIds[]             = $product->get_id();
+                                    $product_id = $product->get_id();
+                                    $MJ_price_new = mj_same_price_everywhere($product_id, $on_sale_first = true);
+                                    $esc_post_url = esc_url($product->get_permalink());
+                                    $esc_title = esc_html($product->get_title());
+                                    $esc_thumbnail_url = wp_get_attachment_image_src(get_post_thumbnail_id($product_id), 'medium');
 
-    if (count($product_query->posts)) {
-        foreach ($product_query->posts as $variation_id) {
-            $variation = wc_get_product($variation_id);
-            if ($variation->get_stock_quantity() && $variation->get_status() == 'publish') {
-                $product = wc_get_product($variation->get_parent_id());
+                                    $data .= '<div class="item" id="produc-' . esc_html($product_id) . '">';
+                                    $data .= '<div class="img-box">';
+                                    $data .= '<a href="' . $esc_post_url . '" target="_blank">';
+                                    $data .= '<img class="pic no-lazy" src="' . esc_url($esc_thumbnail_url[0]) . '" alt="' . esc_attr($esc_title) . '">';
+                                    $data .= '</a>';
+                                    $data .= $MJ_price_new['custom_shape'];
 
-                if (!in_array($product->get_id(), $productsIds) && $product) {
-                    $productsIds[] = $product->get_id();
-                    $product_id = $product->get_id();
-                    $MJ_price_new = mj_same_price_everywhere($product_id, true);
-                    $esc_post_url = esc_url($product->get_permalink());
-                    $esc_title = esc_html($product->get_title());
-                    $esc_thumbnail_url = wp_get_attachment_image_src(get_post_thumbnail_id($product_id), 'medium');
+                                    $data .= '<div class="available-color">' . vertuka_display_available_colors($product_id) . '</div>';
+                                    $data .= '</div>';
+                                    $data .= '<div class="category"><p class="m-0"><a href="' . vertuka_get_category_array($product_id)['url'] . '">' . vertuka_get_category_array($product_id)['name'] . '</a></p></div>';
+                                    $data .= '<div class="title">';
+                                    $data .= '<h3><a href="' . $esc_post_url . '" target="_blank">' . $esc_title . '</a></h3>';
+                                    $data .= '</div>';
 
-                    $data .= '<div class="item" id="produc-' . esc_html($product_id) . '">';
-                    $data .= '<div class="img-box">';
-                    $data .= '<a href="' . $esc_post_url . '" target="_blank">';
-                    $data .= '<img class="pic no-lazy" src="' . esc_url($esc_thumbnail_url[0]) . '" alt="' . esc_attr($esc_title) . '">';
-                    $data .= '</a>';
-                    $data .= $MJ_price_new['custom_shape'];
-                    $data .= '<div class="available-color">' . vertuka_display_available_colors($product_id) . '</div>';
-                    $data .= '</div>';
-                    $data .= '<div class="category"><p class="m-0"><a href="' . vertuka_get_category_array($product_id)['url'] . '">' . vertuka_get_category_array($product_id)['name'] . '</a></p></div>';
-                    $data .= '<div class="title">';
-                    $data .= '<h3><a href="' . $esc_post_url . '" target="_blank">' . $esc_title . '</a></h3>';
-                    $data .= '</div>';
-                    $data .= $MJ_price_new['text'];
-                    $data .= $MJ_price_new['discount_percent'];
-                    $data .= '</div>';
+                                    $data .= $MJ_price_new['text'];
+
+
+                                    $data .= $MJ_price_new['discount_percent'];
+
+                                    $data .= '</div>';
+                                    // var_dump('yes');
+                                }
+                            }
+                        }
+                    } else {
+                        $data = 'محصولی برای نمایش وجود ندارد!';
+                    }
+
+                    wp_upload_bits('home-carousel.html', null, $data);
+                    echo $data;
+                } else {
+                    echo file_get_contents(wp_upload_dir()['basedir'] . "/" . date("Y") . "/" . date("m") . "/home-carousel.html");
                 }
-            }
-        }
-    } else {
-        $data = 'محصولی برای نمایش وجود ندارد!';
-    }
-
-    // ذخیره در کش به مدت ۱۵ دقیقه (۹۰۰ ثانیه)
-    set_transient($cache_key, $data, 15 * MINUTE_IN_SECONDS);
-
-    echo $data;
-}
-
-vertuka_render_home_carousel_cached();
-
-
-?>
+                ?>
 
             </div>
         </div>

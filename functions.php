@@ -492,7 +492,7 @@ add_action('wp_enqueue_scripts', 'enqueue_image_dumper_template_styles');
 //         'user-status-js', // Handle (شناسه منحصر به فرد)
 //         $script_url,      // URL فایل جاوااسکریپت
 //         array('jquery'),  // وابستگی‌ها (در اینجا jQuery)
-//         '1.2.0',          // ورژن فایل
+//         1.2.0,          // ورژن فایل
 //         true              // بارگذاری در Footer (true = در انتهای صفحه)
 //     );
 // }
@@ -719,3 +719,175 @@ function empty_cart_ajax()
 }
 add_action('wp_ajax_empty_cart', 'empty_cart_ajax');
 add_action('wp_ajax_nopriv_empty_cart', 'empty_cart_ajax');
+
+
+add_action('wp_ajax_verify_national_id', 'verify_national_id_callback');
+add_action('wp_ajax_nopriv_verify_national_id', 'verify_national_id_callback');
+
+function verify_national_id_callback()
+{
+    // Verify nonce
+    check_ajax_referer('verify_national_id_nonce', 'security');
+
+    // Get current user ID
+    $user_id = get_current_user_id();
+    if (!$user_id) {
+        wp_send_json_error(['type' => 'server-error', 'message' => 'User not logged in']);
+    }
+
+    // Get user's phone number
+    $phone_number = get_user_meta($user_id, 'phone_number', true);
+    if (!$phone_number) {
+        wp_send_json_error(['type' => 'server-error', 'message' => 'Phone number not found']);
+    }
+
+    // Get national code from request
+    $national_code = sanitize_text_field($_POST['national_code']);
+    $name = sanitize_text_field($_POST['name']);
+    $family = sanitize_text_field($_POST['family']);
+    
+    $attempts_key = 'verification_attempts_' . $phone_number;
+    $attempts = get_option($attempts_key, []);
+    if (count($attempts) >= 3) {
+        wp_send_json_error(['type' => 'too-much-error', 'message' => 'Too many attempts']);
+    }
+
+    // Check internal cache
+    $cache_key = 'verification_attempts_cache_' . $phone_number;
+    $cached_code = get_option($cache_key);
+    if ($cached_code && $cached_code === $national_code) {
+        $attempts_key = 'verification_attempts_' . $phone_number;
+        $attempts = get_option($attempts_key, []);
+        $current_time = time();
+        $attempts = array_filter($attempts, function ($timestamp) use ($current_time) {
+            return ($current_time - $timestamp) < 180; // 3 minutes
+        });
+        wp_send_json_error(['type' => 'error', 'message' => 'National ID does not match', 'api_response' => 'Cached response']);
+    }
+
+    // Check anti-spam mechanism
+    $attempts_key = 'verification_attempts_' . $phone_number;
+    $attempts = get_option($attempts_key, []);
+    $current_time = time();
+    $attempts = array_filter($attempts, function ($timestamp) use ($current_time) {
+        return ($current_time - $timestamp) < 180; // 3 minutes
+    });
+
+    
+
+    // Call Shahkar API
+    $response = wp_remote_post('https://service.zohal.io/api/v0/services/inquiry/shahkar', [
+        'headers' => [
+            'Authorization' => 'Bearer 3fee0bf14ed4fe060ce4a403ff556e259417db98',
+            'Content-Type' => 'application/json',
+        ],
+        'body' => json_encode([
+            'mobile' => $phone_number,
+            'national_code' => $national_code,
+        ]),
+    ]);
+
+    $counter = get_option('national_id_counter', 0);
+    update_option('national_id_counter', $counter - 1);
+
+    if (is_wp_error($response)) {
+        wp_send_json_error(['type' => 'server-error', 'message' => 'API request failed', 'api_response' => $response->get_error_message()]);
+    }
+
+    $body = json_decode(wp_remote_retrieve_body($response), true);
+
+    if ($body['result'] === 1 && $body['response_body']['data']['matched'] === true) {
+        // Increment request counter for admin
+        update_user_meta($user_id, 'national_code', $national_code);
+        update_user_meta($user_id, 'first_name ', $name);
+        update_user_meta($user_id, 'last_name', $family);
+        wp_send_json_success(['api_response' => $body]);
+    } else {
+        $attempts[] = $current_time;
+        update_option($attempts_key, $attempts);
+
+        // Cache the failed attempt
+        update_option($cache_key, $national_code, false, 180); // Cache for 3 minutes
+
+        if ($body['result'] === 4 || $body['result'] === 5) {
+            wp_send_json_error(['type' => 'server-error', 'message' => 'API error', 'api_response' => $body]);
+        }elseif($body['result'] === 6){
+            wp_send_json_error(['type' => 'error', 'message' => 'National ID does not match', 'api_response' => $body]);
+        }else {
+            wp_send_json_error(['type' => 'error', 'message' => 'National ID does not match', 'api_response' => $body]);
+        }
+    }
+    
+}
+
+// Add admin menu for managing national ID requests
+add_action('admin_menu', 'add_national_id_status_menu');
+function add_national_id_status_menu() {
+    add_submenu_page(
+        'options-general.php',
+        'وضعیت استعلام کد ملی',
+        'وضعیت استعلام کد ملی',
+        'manage_options',
+        'national-id-status',
+        'render_national_id_status_page'
+    );
+}
+
+function render_national_id_status_page() {
+    if (!current_user_can('manage_options')) {
+        return;
+    }
+
+    if (isset($_POST['add_balance'])) {
+        $additional_balance = intval($_POST['additional_balance']);
+        $counter = get_option('national_id_counter', 0);
+        update_option('national_id_counter', $counter + $additional_balance);
+    }
+
+    $counter = get_option('national_id_counter', 0);
+    ?>
+    <div class="wrap">
+        <h1>وضعیت استعلام کد ملی</h1>
+        <form method="post">
+            <table class="form-table">
+                <tr>
+                    <th scope="row">مانده درخواست‌ها</th>
+                    <td><input type="text" value="<?php echo esc_attr($counter); ?>" readonly /></td>
+                </tr>
+                <tr>
+                    <th scope="row">اضافه کردن موجودی</th>
+                    <td><input type="number" name="additional_balance" value="0" /></td>
+                </tr>
+            </table>
+            <p class="submit">
+                <input type="submit" name="add_balance" class="button button-primary" value="Add Balance" />
+            </p>
+        </form>
+    </div>
+    <?php
+}
+
+// Add admin bar node
+add_action('admin_bar_menu', 'add_national_id_status_to_admin_bar', 100);
+function add_national_id_status_to_admin_bar($wp_admin_bar) {
+    if (!current_user_can('manage_options')) {
+        return;
+    }
+
+    $counter = get_option('national_id_counter', 0);
+    $color = 'red';
+    if ($counter > 50) {
+        $color = 'green';
+    } elseif ($counter > 10) {
+        $color = 'orange';
+    }
+
+    $args = array(
+        'id'    => 'national_id_status',
+        'title' => '<span style="color: ' . $color . ';">وضعیت موجودی کد ملی: ' . $counter . '</span>',
+        'href'  => admin_url('options-general.php?page=national-id-status'),
+        'meta'  => array('class' => 'national-id-status'),
+    );
+    $wp_admin_bar->add_node($args);
+}
+
